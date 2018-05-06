@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+    <VERSION>1</VERSION>
+    <LANGU>E</LANGU>
+    <DESCRIPT>Shows a list with info about interface executions</DESCRIPT>
+    <EXPOSURE>2</EXPOSURE>
+    <STATE>1</STATE>
+    <CLSFINAL>X</CLSFINAL>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>INTERFACE_SELECTED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Interface execution has been selected</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>MD_TITLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ALV Control: Title bar text</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>MO_GRID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Basis Class for Simple Tables</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>ON_GRID_DOUBLE_CLICK</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Handles Grid doubleClick() event</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>ON_GRID_LINK_CLICK</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Handes Grid LinkClick() event</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>ON_SUMMARY_INTERFACE_SELECTED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Handles SummaryInterfaceSelected( ) event</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>RAISE_INTERFACE_SELECTED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Raise InterfaceSelected() event</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_LIST</CLSNAME>
+     <CMPNAME>SET_GRID_DATA</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Sets Grid data to be displayed</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

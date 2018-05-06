@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>ZCL_INTFMONITOR_GUI_APPL_COMP</CLSNAME>
+    <VERSION>1</VERSION>
+    <LANGU>E</LANGU>
+    <DESCRIPT>SAP Monitor Interface Appl - Gui Component</DESCRIPT>
+    <EXPOSURE>2</EXPOSURE>
+    <STATE>1</STATE>
+    <CLSABSTRCT>X</CLSABSTRCT>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_APPL_COMP</CLSNAME>
+     <CMPNAME>DISPLAY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Displays data on screen</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_APPL_COMP</CLSNAME>
+     <CMPNAME>MO_CONTAINER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Abstract Container for GUI Controls</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_APPL_COMP</CLSNAME>
+     <CMPNAME>MT_LIST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>List of interface executions</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_APPL_COMP</CLSNAME>
+     <CMPNAME>PREPARE_DATA</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Prepares data to be displayed on screen</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_APPL_COMP</CLSNAME>
+     <CMPNAME>SET_LIST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Sets data list in order to be shown on screen</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_GUI_APPL_COMP</CLSNAME>
+     <CMPNAME>_DISPLAY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Own Display implementation</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>
