@@ -4,29 +4,26 @@ CLASS zcl_zintfmonitor020_read DEFINITION
   CREATE PRIVATE .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_ZINTFMONITOR020_READ
-*"* do not include other source files here!!!
 
     TYPES:
-      "! <p class="shorttext synchronized" lang="en">All fields in ranges</p>
+
       BEGIN OF mtyp_all_fields,
-        guid        TYPE RANGE OF zintfmonitor020-guid,
-        intfid      TYPE RANGE OF zintfmonitor020-intfid,
-        procdate    TYPE RANGE OF zintfmonitor020-procdate,
-        proctime    TYPE RANGE OF zintfmonitor020-proctime,
-        procby      TYPE RANGE OF zintfmonitor020-procby,
-        procendtype TYPE RANGE OF zintfmonitor020-procendtype,
-        lognumber   TYPE RANGE OF zintfmonitor020-lognumber,
-      END   OF mtyp_all_fields .
+        intfid      TYPE RANGE OF zeintfmonitor_detail-intfid,
+        procdate    TYPE RANGE OF zeintfmonitor_detail-procdate,
+        proctime    TYPE RANGE OF zeintfmonitor_detail-proctime,
+        procby      TYPE RANGE OF zeintfmonitor_detail-procby,
+        procendtype TYPE RANGE OF zeintfmonitor_detail-procendtype,
+        lognumber   TYPE RANGE OF zeintfmonitor_detail-lognumber,
+      END OF mtyp_all_fields.
 
     "! <p class="shorttext synchronized" lang="en">Delete Details</p>
     "!
-    "! @parameter is_detail | <p class="shorttext synchronized" lang="en">List Details</p>
-    CLASS-METHODS delete_detail
+    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
+    CLASS-METHODS delete_details
       IMPORTING
-        !is_detail TYPE zintfmonitor020
+        !is_details TYPE zintfmonitor020
       RAISING
-        cx_db2_not_found .
+        zcx_intfmonitor .
     "! <p class="shorttext synchronized" lang="en">Delete Multiple</p>
     "!
     "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
@@ -34,18 +31,18 @@ CLASS zcl_zintfmonitor020_read DEFINITION
       IMPORTING
         !it_list TYPE ztt_zintfmonitor020
       RAISING
-        cx_db2_not_found .
+        zcx_intfmonitor .
     "! <p class="shorttext synchronized" lang="en">Find details by keys</p>
     "!
     "! @parameter id_guid   | <p class="shorttext synchronized" lang="en">Process Id</p>
     "! @parameter rs_result | <p class="shorttext synchronized" lang="en">Details</p>
-    CLASS-METHODS get_detail
+    CLASS-METHODS get_details
       IMPORTING
         !id_guid         TYPE zintfmonitor020-guid
       RETURNING
         VALUE(rs_result) TYPE zintfmonitor020
       RAISING
-        cx_db2_not_found .
+        zcx_intfmonitor .
     "! <p class="shorttext synchronized" lang="en">Find Multiple details by keys</p>
     "!
     "! @parameter id_guid | <p class="shorttext synchronized" lang="en">Process Id</p>
@@ -56,28 +53,23 @@ CLASS zcl_zintfmonitor020_read DEFINITION
       EXPORTING
         !et_list TYPE ztt_zintfmonitor020
       RAISING
-        cx_db2_not_found .
-    "! <p class="shorttext synchronized" lang="en">Find Multiple details by any given field</p>
-    "!
-    "! @parameter is_filter_by | <p class="shorttext synchronized" lang="en">All fields in ranges</p>
-    "! @parameter et_list      | <p class="shorttext synchronized" lang="en">SAP Interface Monitor - Interface executions</p>
+        zcx_intfmonitor .
     CLASS-METHODS get_list_by
       IMPORTING
-        !is_filter_by TYPE mtyp_all_fields
+        !is_filter_by TYPE zcl_zintfmonitor020_read=>mtyp_all_fields
       EXPORTING
-        !et_list      TYPE ztt_zintfmonitor020
-      RAISING
-        cx_db2_not_found .
+        !et_list      TYPE ztt_zintfmonitor020.
+
     "! <p class="shorttext synchronized" lang="en">Initializes Buffer Data</p>
     CLASS-METHODS init_buffer .
     "! <p class="shorttext synchronized" lang="en">Save Details</p>
     "!
-    "! @parameter is_detail | <p class="shorttext synchronized" lang="en">List Details</p>
-    CLASS-METHODS save_detail
+    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
+    CLASS-METHODS save_details
       IMPORTING
-        !is_detail TYPE zintfmonitor020
+        !is_details TYPE zintfmonitor020
       RAISING
-        cx_db2_not_found .
+        zcx_intfmonitor .
     "! <p class="shorttext synchronized" lang="en">Save Multiple</p>
     "!
     "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
@@ -85,16 +77,17 @@ CLASS zcl_zintfmonitor020_read DEFINITION
       IMPORTING
         !it_list TYPE ztt_zintfmonitor020
       RAISING
-        cx_db2_not_found .
+        zcx_intfmonitor .
   PROTECTED SECTION.
-*"* protected components of class ZCL_ZINTFMONITOR020_READ
-*"* do not include other source files here!!!
   PRIVATE SECTION.
-*"* private components of class ZCL_ZINTFMONITOR020_READ
-*"* do not include other source files here!!!
+
+    TYPES:
+      BEGIN OF mtyp_ranges,
+        guid TYPE RANGE OF zintfmonitor020-guid,
+      END   OF mtyp_ranges .
 
     "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
-    CLASS-DATA ms_ranges TYPE mtyp_all_fields .
+    CLASS-DATA ms_ranges TYPE mtyp_ranges .
     "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
     CLASS-DATA mt_buffer TYPE ztt_zintfmonitor020 .
 
@@ -111,17 +104,17 @@ ENDCLASS.
 CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
 
 
-  METHOD delete_detail.
+  METHOD delete_details.
     DATA lt_list      TYPE ztt_zintfmonitor020 .
     DATA ls_list      LIKE LINE OF lt_list.
-    DATA lo_exception TYPE REF TO  cx_db2_not_found.
+    DATA lo_exception TYPE REF TO  zcx_intfmonitor.
 
-    CHECK is_detail IS NOT INITIAL.
+    CHECK is_details IS NOT INITIAL.
     TRY .
-        MOVE-CORRESPONDING is_detail TO ls_list.
+        MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
         delete_list( lt_list[] ).
-      CATCH cx_db2_not_found INTO lo_exception.
+      CATCH zcx_intfmonitor INTO lo_exception.
         RAISE EXCEPTION lo_exception.
     ENDTRY.
   ENDMETHOD.
@@ -133,16 +126,16 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
     DELETE zintfmonitor020  FROM TABLE it_list.
 
     IF NOT sy-subrc IS INITIAL.
-      RAISE EXCEPTION TYPE cx_db2_not_found.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
     ENDIF.
   ENDMETHOD.
 
 
-  METHOD get_detail.
+  METHOD get_details.
 
     DATA lt_list      TYPE ztt_zintfmonitor020 .
     DATA ls_list      LIKE LINE OF lt_list.
-    DATA lo_exception TYPE REF TO cx_db2_not_found.
+    DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
     READ TABLE mt_buffer INTO rs_result
       WITH KEY guid = id_guid.
@@ -156,7 +149,7 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
           READ TABLE lt_list INDEX 1 INTO ls_list.
           MOVE-CORRESPONDING ls_list TO rs_result.
 
-        CATCH cx_db2_not_found INTO lo_exception.
+        CATCH zcx_intfmonitor INTO lo_exception.
           RAISE EXCEPTION lo_exception.
       ENDTRY.
 
@@ -173,32 +166,17 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
                   CHANGING  ct_range = ms_ranges-guid ).
     ENDIF.
 
-    get_list_by( EXPORTING is_filter_by = ms_ranges
-                 IMPORTING et_list      = et_list ).
-
-  ENDMETHOD.
-
-
-  METHOD get_list_by.
-
     SELECT * INTO TABLE et_list
       FROM zintfmonitor020
-      WHERE guid        IN is_filter_by-guid
-        AND intfid      IN is_filter_by-intfid
-        AND procdate    IN is_filter_by-procdate
-        AND proctime    IN is_filter_by-proctime
-        AND procby      IN is_filter_by-procby
-        AND procendtype IN is_filter_by-procendtype
-        AND lognumber   IN is_filter_by-lognumber.
+      WHERE guid IN ms_ranges-guid.
 
     INSERT LINES OF et_list INTO TABLE mt_buffer.
     SORT mt_buffer.
     DELETE ADJACENT DUPLICATES FROM mt_buffer.
 
     IF et_list IS INITIAL.
-      RAISE EXCEPTION TYPE cx_db2_not_found.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
     ENDIF.
-
   ENDMETHOD.
 
 
@@ -207,17 +185,17 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD save_detail.
+  METHOD save_details.
     DATA lt_list TYPE ztt_zintfmonitor020 .
     DATA ls_list LIKE LINE OF lt_list.
-    DATA lo_exception TYPE REF TO cx_db2_not_found.
+    DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
-    CHECK is_detail IS NOT INITIAL.
+    CHECK is_details IS NOT INITIAL.
     TRY .
-        MOVE-CORRESPONDING is_detail TO ls_list.
+        MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
         save_list( lt_list[] ).
-      CATCH cx_db2_not_found INTO lo_exception.
+      CATCH zcx_intfmonitor INTO lo_exception.
         RAISE EXCEPTION lo_exception.
     ENDTRY.
   ENDMETHOD.
@@ -229,7 +207,7 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
     MODIFY zintfmonitor020  FROM TABLE it_list.
 
     IF NOT sy-subrc IS INITIAL.
-      RAISE EXCEPTION TYPE cx_db2_not_found.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
     ENDIF.
   ENDMETHOD.
 
@@ -252,4 +230,27 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
     ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>.
     <ld_option> = 'EQ'.
   ENDMETHOD.
+
+
+  METHOD get_list_by.
+
+
+    SELECT * INTO TABLE et_list
+      FROM zintfmonitor020
+      WHERE intfid      IN is_filter_by-intfid
+        AND procby      IN is_filter_by-procby
+        AND procdate    IN is_filter_by-procdate
+        AND procendtype IN is_filter_by-procendtype
+        AND proctime    IN is_filter_by-proctime
+        AND lognumber   IN is_filter_by-lognumber.
+
+    INSERT LINES OF et_list INTO TABLE mt_buffer.
+    SORT mt_buffer.
+    DELETE ADJACENT DUPLICATES FROM mt_buffer.
+
+    IF et_list IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
+    ENDIF.
+  ENDMETHOD.
+
 ENDCLASS.

@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>SAP Interface Monitor - Gui</CTEXT>
+    <CTEXT>$SAPINTERFACEMONITOR_GUI</CTEXT>
    </DEVC>
   </asx:values>
  </asx:abap>

@@ -1,4 +1,4 @@
-class ZCL_ZINTFMONITOR013_READ definition
+class ZCL_ZINTFMONITOR012_READ definition
   public
   create private .
 
@@ -6,41 +6,39 @@ public section.
 
   class-methods DELETE_DETAILS
     importing
-      !IS_DETAILS type ZINTFMONITOR013
+      !IS_DETAILS type ZINTFMONITOR012
     raising
       zcx_intfmonitor .
   class-methods DELETE_LIST
     importing
-      !IT_LIST type ZTT_ZINTFMONITOR013
+      !IT_LIST type ZTT_ZINTFMONITOR012
     raising
       zcx_intfmonitor .
   class-methods GET_DETAILS
     importing
-      !ID_INTFID type ZINTFMONITOR013-INTFID
-      !ID_SPRAS type ZINTFMONITOR013-SPRAS
-      !ID_PARAM type ZINTFMONITOR013-PARAM
+      !ID_INTFID type ZINTFMONITOR012-INTFID
+      !ID_PARAM type ZINTFMONITOR012-PARAM
     returning
-      value(RS_RESULT) type ZINTFMONITOR013
+      value(RS_RESULT) type ZINTFMONITOR012
     raising
       zcx_intfmonitor .
   class-methods GET_LIST
     importing
-      !ID_INTFID type ZINTFMONITOR013-INTFID optional
-      !ID_SPRAS type ZINTFMONITOR013-SPRAS optional
-      !ID_PARAM type ZINTFMONITOR013-PARAM optional
+      !ID_INTFID type ZINTFMONITOR012-INTFID optional
+      !ID_PARAM type ZINTFMONITOR012-PARAM optional
     exporting
-      !ET_LIST type ZTT_ZINTFMONITOR013
+      !ET_LIST type ZTT_ZINTFMONITOR012
     raising
       zcx_intfmonitor .
   class-methods INIT_BUFFER .
   class-methods SAVE_DETAILS
     importing
-      !IS_DETAILS type ZINTFMONITOR013
+      !IS_DETAILS type ZINTFMONITOR012
     raising
       zcx_intfmonitor .
   class-methods SAVE_LIST
     importing
-      !IT_LIST type ZTT_ZINTFMONITOR013
+      !IT_LIST type ZTT_ZINTFMONITOR012
     raising
       zcx_intfmonitor .
 protected section.
@@ -48,13 +46,12 @@ private section.
 
   types:
      BEGIN OF mtyp_ranges,
- INTFID TYPE RANGE OF ZINTFMONITOR013-INTFID ,
- SPRAS TYPE RANGE OF ZINTFMONITOR013-SPRAS ,
- PARAM TYPE RANGE OF ZINTFMONITOR013-PARAM ,
+ INTFID TYPE RANGE OF ZINTFMONITOR012-INTFID ,
+ PARAM TYPE RANGE OF ZINTFMONITOR012-PARAM ,
         END   OF mtyp_ranges .
 
   class-data MS_RANGES type MTYP_RANGES .
-  class-data MT_BUFFER type ZTT_ZINTFMONITOR013 .
+  class-data MT_BUFFER type ZTT_ZINTFMONITOR012 .
 
   class-methods _ADD_RANGE
     importing
@@ -65,11 +62,11 @@ ENDCLASS.
 
 
 
-CLASS ZCL_ZINTFMONITOR013_READ IMPLEMENTATION.
+CLASS ZCL_ZINTFMONITOR012_READ IMPLEMENTATION.
 
 
   method DELETE_DETAILS.
-  DATA lt_list      TYPE ZTT_ZINTFMONITOR013 .
+  DATA lt_list      TYPE ZTT_ZINTFMONITOR012 .
   DATA ls_list      LIKE LINE OF lt_list.
   DATA lo_exception TYPE REF TO  zcx_intfmonitor.
 
@@ -87,7 +84,7 @@ CLASS ZCL_ZINTFMONITOR013_READ IMPLEMENTATION.
   method DELETE_LIST.
 
   CHECK it_list[] IS NOT INITIAL.
-  DELETE ZINTFMONITOR013  FROM TABLE it_list.
+  DELETE ZINTFMONITOR012  FROM TABLE it_list.
 
   IF NOT sy-subrc IS INITIAL.
     RAISE EXCEPTION TYPE zcx_intfmonitor.
@@ -97,20 +94,18 @@ CLASS ZCL_ZINTFMONITOR013_READ IMPLEMENTATION.
 
   method GET_DETAILS.
 
-  DATA lt_list      TYPE ZTT_ZINTFMONITOR013 .
+  DATA lt_list      TYPE ZTT_ZINTFMONITOR012 .
   DATA ls_list      LIKE LINE OF lt_list.
   DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
   READ TABLE mt_buffer INTO rs_result
     WITH KEY INTFID = ID_INTFID
-						 SPRAS = ID_SPRAS
 						 PARAM = ID_PARAM.
 
   IF NOT sy-subrc IS INITIAL.
 
     TRY.
         get_list( EXPORTING  ID_INTFID = ID_INTFID
-														 ID_SPRAS = ID_SPRAS
 														 ID_PARAM = ID_PARAM
                   IMPORTING  et_list = lt_list ).
 
@@ -134,20 +129,14 @@ CLASS ZCL_ZINTFMONITOR013_READ IMPLEMENTATION.
                 CHANGING  ct_range = ms_ranges-INTFID ).
   ENDIF.
 
-  IF ID_SPRAS IS SUPPLIED.
-    _add_range( EXPORTING id_low   = ID_SPRAS
-                CHANGING  ct_range = ms_ranges-SPRAS ).
-  ENDIF.
-
   IF ID_PARAM IS SUPPLIED.
     _add_range( EXPORTING id_low   = ID_PARAM
                 CHANGING  ct_range = ms_ranges-PARAM ).
   ENDIF.
 
 SELECT * INTO TABLE et_list
-  FROM ZINTFMONITOR013
+  FROM ZINTFMONITOR012
   WHERE INTFID IN ms_ranges-INTFID
-    AND SPRAS IN ms_ranges-SPRAS
     AND PARAM IN ms_ranges-PARAM.
 
   INSERT LINES OF et_list INTO TABLE mt_buffer.
@@ -166,7 +155,7 @@ SELECT * INTO TABLE et_list
 
 
   method SAVE_DETAILS.
-  DATA lt_list type ZTT_ZINTFMONITOR013 .
+  DATA lt_list type ZTT_ZINTFMONITOR012 .
   DATA ls_list like line of lt_list.
   DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
@@ -184,7 +173,7 @@ SELECT * INTO TABLE et_list
   method SAVE_LIST.
 
   CHECK it_list[] IS NOT INITIAL.
-  MODIFY ZINTFMONITOR013  FROM TABLE it_list.
+  MODIFY ZINTFMONITOR012  FROM TABLE it_list.
 
   IF NOT sy-subrc IS INITIAL.
     RAISE EXCEPTION TYPE zcx_intfmonitor.
