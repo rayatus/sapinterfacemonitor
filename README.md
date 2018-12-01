@@ -1,2 +1,2 @@
-# sapinterfacemonitor
+# SAPInterfaceMonitor
 SAP interface monitor
