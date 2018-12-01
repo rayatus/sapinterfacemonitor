@@ -1,6 +1,7 @@
 CLASS zcx_intfmonitor DEFINITION
   PUBLIC
-  INHERITING FROM cx_dynamic_check
+  FINAL
+  INHERITING FROM cx_static_check
   CREATE PUBLIC .
 
   PUBLIC SECTION.

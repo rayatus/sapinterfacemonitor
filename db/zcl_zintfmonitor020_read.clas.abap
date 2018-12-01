@@ -1,4 +1,3 @@
-"! <p class="shorttext synchronized" lang="en">DB Framework for: ZINTFMONITOR020</p>
 CLASS zcl_zintfmonitor020_read DEFINITION
   PUBLIC
   CREATE PRIVATE .
@@ -6,36 +5,25 @@ CLASS zcl_zintfmonitor020_read DEFINITION
   PUBLIC SECTION.
 
     TYPES:
-
       BEGIN OF mtyp_all_fields,
-        intfid      TYPE RANGE OF zeintfmonitor_detail-intfid,
-        procdate    TYPE RANGE OF zeintfmonitor_detail-procdate,
-        proctime    TYPE RANGE OF zeintfmonitor_detail-proctime,
-        procby      TYPE RANGE OF zeintfmonitor_detail-procby,
-        procendtype TYPE RANGE OF zeintfmonitor_detail-procendtype,
-        lognumber   TYPE RANGE OF zeintfmonitor_detail-lognumber,
+        intfid      TYPE RANGE OF zzeintfid,
+        procdate    TYPE RANGE OF zzeprocdate,
+        proctime    TYPE RANGE OF zzeproctime,
+        procby      TYPE RANGE OF zzeprocby,
+        procendtype TYPE RANGE OF zzeprocendtype,
+        lognumber   TYPE RANGE OF balognr,
       END OF mtyp_all_fields.
 
-    "! <p class="shorttext synchronized" lang="en">Delete Details</p>
-    "!
-    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS delete_details
       IMPORTING
         !is_details TYPE zintfmonitor020
       RAISING
         zcx_intfmonitor .
-    "! <p class="shorttext synchronized" lang="en">Delete Multiple</p>
-    "!
-    "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS delete_list
       IMPORTING
         !it_list TYPE ztt_zintfmonitor020
       RAISING
         zcx_intfmonitor .
-    "! <p class="shorttext synchronized" lang="en">Find details by keys</p>
-    "!
-    "! @parameter id_guid   | <p class="shorttext synchronized" lang="en">Process Id</p>
-    "! @parameter rs_result | <p class="shorttext synchronized" lang="en">Details</p>
     CLASS-METHODS get_details
       IMPORTING
         !id_guid         TYPE zintfmonitor020-guid
@@ -43,10 +31,6 @@ CLASS zcl_zintfmonitor020_read DEFINITION
         VALUE(rs_result) TYPE zintfmonitor020
       RAISING
         zcx_intfmonitor .
-    "! <p class="shorttext synchronized" lang="en">Find Multiple details by keys</p>
-    "!
-    "! @parameter id_guid | <p class="shorttext synchronized" lang="en">Process Id</p>
-    "! @parameter et_list | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS get_list
       IMPORTING
         !id_guid TYPE zintfmonitor020-guid OPTIONAL
@@ -54,30 +38,22 @@ CLASS zcl_zintfmonitor020_read DEFINITION
         !et_list TYPE ztt_zintfmonitor020
       RAISING
         zcx_intfmonitor .
-    CLASS-METHODS get_list_by
-      IMPORTING
-        !is_filter_by TYPE zcl_zintfmonitor020_read=>mtyp_all_fields
-      EXPORTING
-        !et_list      TYPE ztt_zintfmonitor020.
-
-    "! <p class="shorttext synchronized" lang="en">Initializes Buffer Data</p>
     CLASS-METHODS init_buffer .
-    "! <p class="shorttext synchronized" lang="en">Save Details</p>
-    "!
-    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS save_details
       IMPORTING
         !is_details TYPE zintfmonitor020
       RAISING
         zcx_intfmonitor .
-    "! <p class="shorttext synchronized" lang="en">Save Multiple</p>
-    "!
-    "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS save_list
       IMPORTING
         !it_list TYPE ztt_zintfmonitor020
       RAISING
         zcx_intfmonitor .
+    CLASS-METHODS get_list_by
+      IMPORTING
+        is_filter_by TYPE mtyp_all_fields
+      EXPORTING
+        et_list      TYPE ztt_zintfmonitor020 .
   PROTECTED SECTION.
   PRIVATE SECTION.
 
@@ -86,12 +62,9 @@ CLASS zcl_zintfmonitor020_read DEFINITION
         guid TYPE RANGE OF zintfmonitor020-guid,
       END   OF mtyp_ranges .
 
-    "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
     CLASS-DATA ms_ranges TYPE mtyp_ranges .
-    "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
     CLASS-DATA mt_buffer TYPE ztt_zintfmonitor020 .
 
-    "! <p class="shorttext synchronized" lang="en">Add to Range</p>
     CLASS-METHODS _add_range
       IMPORTING
         !id_low   TYPE any
@@ -230,27 +203,18 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
     ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>.
     <ld_option> = 'EQ'.
   ENDMETHOD.
-
-
   METHOD get_list_by.
+    DATA lt_list TYPE STANDARD TABLE OF zintfmonitor020.
+
+    SELECT * FROM zintfmonitor020
+     INTO TABLE et_list
+      WHERE intfid        IN is_filter_by-intfid
+         AND procdate     IN is_filter_by-procdate
+         AND proctime     IN is_filter_by-proctime
+         AND procby       IN is_filter_by-procby
+         AND procendtype  IN is_filter_by-procendtype
+         AND lognumber IN is_filter_by-lognumber.
 
 
-    SELECT * INTO TABLE et_list
-      FROM zintfmonitor020
-      WHERE intfid      IN is_filter_by-intfid
-        AND procby      IN is_filter_by-procby
-        AND procdate    IN is_filter_by-procdate
-        AND procendtype IN is_filter_by-procendtype
-        AND proctime    IN is_filter_by-proctime
-        AND lognumber   IN is_filter_by-lognumber.
-
-    INSERT LINES OF et_list INTO TABLE mt_buffer.
-    SORT mt_buffer.
-    DELETE ADJACENT DUPLICATES FROM mt_buffer.
-
-    IF et_list IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_intfmonitor.
-    ENDIF.
   ENDMETHOD.
-
 ENDCLASS.

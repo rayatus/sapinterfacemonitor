@@ -141,7 +141,7 @@ CLASS zcl_intfmonitor_gui_appl IMPLEMENTATION.
     build_screen( ).
 
 * Show data on screen
-    mo_summary->display( mo_container_summary ).
+    mo_summary->display( EXPORTING io_container = mo_container_summary ).
     mo_list->display( mo_container_list ).
     mo_detail->display( mo_container_detail ).
 

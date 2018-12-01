@@ -4,16 +4,6 @@ CLASS zcl_zintfmonitor010_read DEFINITION
 
   PUBLIC SECTION.
 
-    CLASS-METHODS delete_details
-      IMPORTING
-        !is_details TYPE zintfmonitor010
-      RAISING
-        zcx_intfmonitor .
-    CLASS-METHODS delete_list
-      IMPORTING
-        !it_list TYPE ztt_zintfmonitor010
-      RAISING
-        zcx_intfmonitor .
     CLASS-METHODS get_details
       IMPORTING
         !id_intfid       TYPE zintfmonitor010-intfid
@@ -29,16 +19,7 @@ CLASS zcl_zintfmonitor010_read DEFINITION
       RAISING
         zcx_intfmonitor .
     CLASS-METHODS init_buffer .
-    CLASS-METHODS save_details
-      IMPORTING
-        !is_details TYPE zintfmonitor010
-      RAISING
-        zcx_intfmonitor .
-    CLASS-METHODS save_list
-      IMPORTING
-        !it_list TYPE ztt_zintfmonitor010
-      RAISING
-        zcx_intfmonitor .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
 
@@ -60,34 +41,6 @@ ENDCLASS.
 
 
 CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
-
-
-  METHOD delete_details.
-    DATA lt_list      TYPE ztt_zintfmonitor010 .
-    DATA ls_list      LIKE LINE OF lt_list.
-    DATA lo_exception TYPE REF TO  zcx_intfmonitor.
-
-    CHECK is_details IS NOT INITIAL.
-    TRY .
-        MOVE-CORRESPONDING is_details TO ls_list.
-        INSERT ls_list INTO TABLE lt_list[].
-        delete_list( lt_list[] ).
-      CATCH zcx_intfmonitor INTO lo_exception.
-        RAISE EXCEPTION lo_exception.
-    ENDTRY.
-  ENDMETHOD.
-
-
-  METHOD delete_list.
-
-    CHECK it_list[] IS NOT INITIAL.
-    DELETE zintfmonitor010  FROM TABLE it_list.
-
-    IF NOT sy-subrc IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_intfmonitor.
-    ENDIF.
-  ENDMETHOD.
-
 
   METHOD get_details.
 
@@ -114,7 +67,6 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-
   METHOD get_list.
 
     CLEAR ms_ranges.
@@ -133,40 +85,13 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
     DELETE ADJACENT DUPLICATES FROM mt_buffer.
 
     IF et_list IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_intfmonitor.
+      RAISE EXCEPTION TYPE cx_os_db.
     ENDIF.
   ENDMETHOD.
 
 
   METHOD init_buffer.
     CLEAR mt_buffer[].
-  ENDMETHOD.
-
-
-  METHOD save_details.
-    DATA lt_list TYPE ztt_zintfmonitor010 .
-    DATA ls_list LIKE LINE OF lt_list.
-    DATA lo_exception TYPE REF TO zcx_intfmonitor.
-
-    CHECK is_details IS NOT INITIAL.
-    TRY .
-        MOVE-CORRESPONDING is_details TO ls_list.
-        INSERT ls_list INTO TABLE lt_list[].
-        save_list( lt_list[] ).
-      CATCH zcx_intfmonitor INTO lo_exception.
-        RAISE EXCEPTION lo_exception.
-    ENDTRY.
-  ENDMETHOD.
-
-
-  METHOD save_list.
-
-    CHECK it_list[] IS NOT INITIAL.
-    MODIFY zintfmonitor010  FROM TABLE it_list.
-
-    IF NOT sy-subrc IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_intfmonitor.
-    ENDIF.
   ENDMETHOD.
 
 
