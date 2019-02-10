@@ -6,8 +6,7 @@ CLASS zcl_intfmonitor_gui_detail DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_INTFMONITOR_GUI_DETAIL
-*"* do not include other source files here!!!
+
     TYPE-POOLS abap .
 
     "! <p class="shorttext synchronized" lang="en">CONSTRUCTOR</p>
@@ -16,34 +15,31 @@ CLASS zcl_intfmonitor_gui_detail DEFINITION
     METHODS on_list_interface_selected
           FOR EVENT interface_selected OF zcl_intfmonitor_gui_list
       IMPORTING
-          !io_interface .
+          io_interface .
 
     METHODS set_list
         REDEFINITION .
   PROTECTED SECTION.
-*"* protected components of class ZCL_INTFMONITOR_GUI_DETAIL
-*"* do not include other source files here!!!
+
 
     METHODS prepare_data
         REDEFINITION .
     METHODS _display
         REDEFINITION .
   PRIVATE SECTION.
-*"* private components of class ZCL_INTFMONITOR_GUI_DETAIL
-*"* do not include other source files here!!!
+
 
     TYPES mtyp_t_tree_data TYPE zcl_intfmonitor_util=>mtyp_t_intf_param .
-
+    "! <p class="shorttext synchronized" lang="en">Prev. interface buffered so that we could avoid tree refresh</p>
+    DATA mo_previous_interface TYPE REF TO zif_intfmonitor .
     "! <p class="shorttext synchronized" lang="en">Dynamic Document for displaying title</p>
     DATA mo_dd_document TYPE REF TO cl_dd_document .
     "! <p class="shorttext synchronized" lang="en">Main container default size</p>
-    CONSTANTS mc_container_height TYPE i VALUE 100.         "#EC NOTEXT
     "! <p class="shorttext synchronized" lang="en">Processing parameter</p>
     CONSTANTS mc_processing TYPE zzeintfdatatype VALUE 'P'. "#EC NOTEXT
     "! <p class="shorttext synchronized" lang="en">Returning parameter</p>
     CONSTANTS mc_returning TYPE zzeintfdatatype VALUE 'R'.  "#EC NOTEXT
     "! <p class="shorttext synchronized" lang="en">Main container current size</p>
-    DATA md_container_height TYPE i VALUE 0.              "#EC NOTEXT .
     "! <p class="shorttext synchronized" lang="en">Grid Container</p>
     DATA mo_container_grid TYPE REF TO cl_gui_container .
     "! <p class="shorttext synchronized" lang="en">Container for title</p>
@@ -72,7 +68,7 @@ CLASS zcl_intfmonitor_gui_detail DEFINITION
     "! <p class="shorttext synchronized" lang="en">Builds grid</p>
     METHODS build_grid
       CHANGING
-        !it_data TYPE ANY TABLE .
+        it_data TYPE ANY TABLE .
     "! <p class="shorttext synchronized" lang="en">Builds screen</p>
     METHODS build_screen .
     "! <p class="shorttext synchronized" lang="en">Builds Title</p>
@@ -244,17 +240,24 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
 
 
   METHOD build_title.
-    DATA: lf_refresh         TYPE xfeld,
-          lo_table           TYPE REF TO cl_dd_table_area,
+    DATA: lf_refresh         TYPE abap_bool,
+          lf_first_time      TYPE abap_bool,
           ld_text            TYPE sdydo_text_element,
           lo_intfmonitor     TYPE REF TO zif_intfmonitor,
           ls_detail_x        TYPE zeintfmonitor_detail_x,
           ld_string_procdate TYPE c LENGTH 10,
           ld_string_proctime TYPE c LENGTH 8.
 
-    IF NOT mo_dd_document IS BOUND.
-      lf_refresh = abap_true.
+    IF mo_dd_document IS NOT BOUND.
+      lf_refresh    = abap_false.
+      lf_first_time = abap_true.
+      CREATE OBJECT mo_dd_document.
+    ELSE.
+      lf_refresh    = abap_true.
+      lf_first_time = abap_false.
     ENDIF.
+
+    mo_dd_document->initialize_document( EXPORTING first_time = lf_first_time ).
 
 * Prepare text to be displayed
     READ TABLE mt_list INDEX 1 INTO lo_intfmonitor.
@@ -262,25 +265,9 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
 
     WRITE ls_detail_x-procdate TO ld_string_procdate.
     WRITE ls_detail_x-proctime TO ld_string_proctime.
+    ld_text = | { ls_detail_x-intfid } { ls_detail_x-xintfid } - { ld_string_procdate } { ld_string_proctime }|. "#EC NOTEXT
 
-    CONCATENATE ls_detail_x-intfid
-                ls_detail_x-xintfid
-                INTO ld_text SEPARATED BY '-'.
-
-    CONCATENATE ld_text
-                ':'
-                INTO ld_text.
-
-    CONCATENATE ld_text
-                ld_string_procdate
-                ld_string_proctime
-                INTO ld_text SEPARATED BY space.
-
-
-* Build title
-    CREATE OBJECT mo_dd_document.
-    mo_dd_document->add_text( text = ld_text ).
-
+    mo_dd_document->add_text( text = ld_text sap_style = mo_dd_document->heading sap_fontsize = mo_dd_document->small ).
     mo_dd_document->merge_document( ).
     IF lf_refresh IS INITIAL.
       mo_dd_document->display_document( parent = mo_container_title ).
@@ -293,7 +280,6 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
 
   METHOD build_tree.
     DATA: lo_cols     TYPE REF TO  cl_salv_columns_tree,
-          lo_col      TYPE REF TO  cl_salv_column_tree,
           lt_cols     TYPE         salv_t_column_ref,
           ls_col      LIKE LINE OF lt_cols,
           ld_icon     TYPE         salv_de_tree_image,
@@ -359,7 +345,7 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
           SET HANDLER on_tree_link_click   FOR lo_events.
 
         CATCH cx_salv_error .
-
+          " Do nothing
       ENDTRY.
     ENDIF.
 
@@ -367,9 +353,8 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
     build_tree_section( mc_processing ).
     build_tree_section( mc_returning ).
 
-    IF lf_new = abap_true.
-      mo_tree->display( ).
-    ENDIF.
+    mo_tree->display( ).
+
 
   ENDMETHOD.
 
@@ -458,66 +443,70 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
           lo_table_descr  TYPE REF TO cl_abap_tabledescr,
           lo_abap_descr   TYPE REF TO cl_abap_datadescr,
           lt_components   TYPE abap_component_tab,
-          lr_data         TYPE REF TO data,
-          lr_row          TYPE REF TO data,
-          ld_counter      TYPE i.
+          lr_data         TYPE REF TO data.
 
     FIELD-SYMBOLS: <lr_data>      TYPE any,
                    <lt_data>      TYPE ANY TABLE,
-                   <ls_data>      TYPE any,
                    <ls_component> LIKE LINE OF lt_components.
 
-* Preconditions
+    "Preconditions
     READ TABLE mt_list INDEX 1 INTO ls_list.
     ASSERT sy-subrc IS INITIAL.
 
     READ TABLE mt_tree_data WITH KEY param = id_param INTO ls_tree_data.
     ASSERT sy-subrc IS INITIAL.
 
-* Retrieve parameter data from interface execution
+
+    "Retrieve parameter data from interface execution
     ls_list->get_parameter( EXPORTING id_param = id_param
                             IMPORTING er_data  = lr_data ).
 
-* Determine stored type and create internal table
+    "Determine stored type and create internal table
     lo_type_descr =  cl_abap_typedescr=>describe_by_data_ref( lr_data ).
-    lo_abap_descr ?= lo_type_descr.
+
 
     CASE lo_type_descr->type_kind.
-      WHEN cl_abap_typedescr=>typekind_table.
-*     It's already an internal table. Just display it
+      WHEN cl_abap_typedescr=>typekind_table OR cl_abap_typedescr=>kind_table.
+        "It's already an internal table. Just display it
         ASSIGN lr_data->* TO <lt_data>.
 
       WHEN OTHERS.
-*     We need to create an internal table
+        "We need to create an internal table in order to add to it stored data
         ASSIGN lr_data->* TO <lr_data>.
+        lo_abap_descr ?= lo_type_descr.
 
         CASE lo_type_descr->kind.
-          WHEN cl_abap_typedescr=>kind_table.
-            lo_table_descr ?= lo_abap_descr.
-
           WHEN cl_abap_typedescr=>kind_struct.
-            lo_struct_descr ?= lo_abap_descr.
-            lo_table_descr  = cl_abap_tabledescr=>create( p_line_type = lo_struct_descr ).
+            "It's already an structure, just create a table from that structure
+            lo_table_descr  = cl_abap_tabledescr=>create( p_line_type = lo_abap_descr ).
+
+            CREATE DATA mr_grid_data TYPE HANDLE lo_table_descr.
+            ASSIGN mr_grid_data->* TO <lt_data>.
+            INSERT INITIAL LINE INTO TABLE <lt_data> ASSIGNING FIELD-SYMBOL(<ls_data>).
+            <ls_data> = <lr_data>.
 
           WHEN OTHERS.
+            "It's an element or simple filed, we need to create an structure of just 1 field because ALV table doesn't support tables that are not from Structures.
             INSERT INITIAL LINE INTO TABLE lt_components ASSIGNING <ls_component>.
             <ls_component>-name = id_param.
             <ls_component>-type = lo_abap_descr.
 
             lo_struct_descr = cl_abap_structdescr=>create( p_components = lt_components ).
+            CREATE DATA lr_data TYPE HANDLE lo_struct_descr.
+            ASSIGN lr_data->* TO <ls_data>.
+
+            ASSIGN COMPONENT 1 OF STRUCTURE <ls_data> TO FIELD-SYMBOL(<ld_data>).
+            <ld_data> = <lr_data>.
+
             lo_table_descr  = cl_abap_tabledescr=>create( p_line_type   = lo_struct_descr ).
+
+            CREATE DATA mr_grid_data TYPE HANDLE lo_table_descr.
+            ASSIGN mr_grid_data->* TO <lt_data>.
+
+            INSERT <ls_data> INTO TABLE <lt_data>.
+
         ENDCASE.
 
-*     We need to create an internal table in order to add to it stored data
-        CREATE DATA lr_row TYPE HANDLE lo_struct_descr.
-        ASSIGN lr_row->* TO <ls_data>.
-
-        CREATE DATA mr_grid_data TYPE HANDLE lo_table_descr.
-        ASSIGN mr_grid_data->* TO <lt_data>.
-
-        <ls_data> = <lr_data>.
-
-        INSERT <ls_data> INTO TABLE <lt_data>.
     ENDCASE.
 
 * Build grid for displaying internal table
@@ -543,11 +532,16 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
 
   METHOD on_list_interface_selected.
 
-    TRY.
-        display_interface_data( io_interface ).
-      CATCH zcx_intfmonitor.
-        "Do nothing
-    ENDTRY.
+    IF mo_previous_interface IS NOT BOUND OR ( mo_previous_interface IS BOUND AND mo_previous_interface <> io_interface ).
+      TRY.
+          display_interface_data( io_interface ).
+        CATCH zcx_intfmonitor.
+          "Do nothing
+      ENDTRY.
+
+    ENDIF.
+
+    mo_previous_interface = io_interface.
 
   ENDMETHOD.
 

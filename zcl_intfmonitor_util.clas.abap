@@ -93,7 +93,7 @@ CLASS zcl_intfmonitor_util IMPLEMENTATION.
                                                               id_param  = <ls_list>-param ).
           <ls_definition>-xparam = ls_details-xparam.
         CATCH zcx_intfmonitor .
-*         Do nothing
+          <ls_definition>-xparam = |< { <ls_list>-param } >|. "#EC NOTEXT
       ENDTRY.
     ENDLOOP.
 

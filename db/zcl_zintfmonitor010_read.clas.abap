@@ -124,7 +124,13 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
         ENDIF.
 
         rs_detail_x-xinbout = zcl_intfmonitor_util=>get_domain_text( id_domname = 'ZZDINTFINOUT' id_value = rs_detail_x-inbout ).
-        rs_detail_x-xintfid = zcl_intfmonitor_util=>get_domain_text( id_domname = 'ZZDINTFID'    id_value = rs_detail_x-intfid ).
+
+        TRY.
+            data(ls_intfmonitor011) = zcl_zintfmonitor011_read=>get_details( id_intfid = rs_detail_x-intfid ).
+            rs_detail_x-xintfid = ls_intfmonitor011-xintfid.
+          CATCH zcx_intfmonitor.
+            rs_detail_x-xintfid = |< { rs_detail_x-intfid } >|.
+        ENDTRY.
 
       CATCH zcx_intfmonitor INTO DATA(lo_exception).
         RAISE EXCEPTION lo_exception.

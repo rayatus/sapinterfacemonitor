@@ -31,6 +31,7 @@ FORM prepare_custo.
   ls_zintfmonitor010-clsname = 'ZCL_INTFMONITOR_RFC'.
   MODIFY zintfmonitor010 FROM ls_zintfmonitor010.
   ls_zintfmonitor011-intfid  = 'DUMMY01'.
+  ls_zintfmonitor011-spras   = sy-langu.
   ls_zintfmonitor011-xintfid = 'DUMMY In RFC Moni'.
   MODIFY zintfmonitor011 FROM ls_zintfmonitor011.
 
@@ -40,6 +41,7 @@ FORM prepare_custo.
   ls_zintfmonitor010-clsname = 'ZCL_INTFMONITOR_RFC'.
   MODIFY zintfmonitor010 FROM ls_zintfmonitor010.
   ls_zintfmonitor011-intfid  = 'DUMMY02'.
+  ls_zintfmonitor011-spras   = sy-langu.
   ls_zintfmonitor011-xintfid = 'DUMMY Out RFC Moni'.
   MODIFY zintfmonitor011 FROM ls_zintfmonitor011.
 

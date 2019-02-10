@@ -27,10 +27,10 @@ FORM status_9001 .
     CREATE OBJECT go_container
       EXPORTING
         container_name = 'CONTAINER'
-        repid          = sy-repid   " Screen to Which this Container is Linked
-        dynnr          = sy-dynnr   " Report To Which this Container is Linked
+        repid          = sy-repid
+        dynnr          = sy-dynnr
       EXCEPTIONS
-        OTHERS         = 6.
+        OTHERS         = 999.
     IF sy-subrc <> 0.
       MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
                  WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.

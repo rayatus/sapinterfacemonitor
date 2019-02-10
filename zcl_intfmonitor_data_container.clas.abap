@@ -26,8 +26,8 @@ CLASS zcl_intfmonitor_data_container DEFINITION
     "! @exception error | <p class="shorttext synchronized" lang="en">Error</p>
     METHODS add
       IMPORTING
-        !id_id   TYPE string
-        !id_data TYPE any
+        id_id   TYPE string
+        id_data TYPE any
       EXCEPTIONS
         error .
     "! <p class="shorttext synchronized" lang="en">Gets data from DataContainer</p>
@@ -40,11 +40,11 @@ CLASS zcl_intfmonitor_data_container DEFINITION
     "! @exception error     | <p class="shorttext synchronized" lang="en">Error</p>
     METHODS get
       IMPORTING
-        !id_id   TYPE string
+        id_id   TYPE string
       EXPORTING
-        !ed_data TYPE any
-        !ed_type TYPE typename
-        !er_data TYPE REF TO data
+        ed_data TYPE any
+        ed_type TYPE typename
+        er_data TYPE REF TO data
       EXCEPTIONS
         not_found
         error .

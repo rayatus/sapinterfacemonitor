@@ -283,7 +283,7 @@ CLASS zcl_intfmonitor_gui_summary IMPLEMENTATION.
         lt_cols = lo_cols->get( ).
         LOOP AT lt_cols INTO ls_col.
           CASE ls_col-columnname.
-            WHEN 'XINTFID'.
+            WHEN 'XINTFID'.                                 "#EC NOTEXT
               ls_col-r_column->set_optimized( ).
             WHEN OTHERS.
               ls_col-r_column->set_technical( ).
