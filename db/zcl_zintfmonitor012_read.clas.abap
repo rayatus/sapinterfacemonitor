@@ -1,19 +1,31 @@
+"! <p class="shorttext synchronized" lang="en">Interface Parameters</p>
 class ZCL_ZINTFMONITOR012_READ definition
   public
-  create private .
+  create private INHERITING FROM zcl_zintfmonitor_base_read..
 
 public section.
 
+  "! <p class="shorttext synchronized" lang="en">Delete Details</p>
+  "!
+  "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
   class-methods DELETE_DETAILS
     importing
       !IS_DETAILS type ZINTFMONITOR012
     raising
       zcx_intfmonitor .
+  "! <p class="shorttext synchronized" lang="en">Delete Multiple</p>
+  "!
+  "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
   class-methods DELETE_LIST
     importing
       !IT_LIST type ZTT_ZINTFMONITOR012
     raising
       zcx_intfmonitor .
+  "! <p class="shorttext synchronized" lang="en">Find details by keys</p>
+  "!
+  "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
+  "! @parameter id_param  | <p class="shorttext synchronized" lang="en">Parameter</p>
+  "! @parameter rs_result | <p class="shorttext synchronized" lang="en">Details</p>
   class-methods GET_DETAILS
     importing
       !ID_INTFID type ZINTFMONITOR012-INTFID
@@ -22,6 +34,11 @@ public section.
       value(RS_RESULT) type ZINTFMONITOR012
     raising
       zcx_intfmonitor .
+  "! <p class="shorttext synchronized" lang="en">Find Multiple details by keys</p>
+  "!
+  "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
+  "! @parameter id_param  | <p class="shorttext synchronized" lang="en">Parameter</p>
+  "! @parameter et_list   | <p class="shorttext synchronized" lang="en">List Details</p>
   class-methods GET_LIST
     importing
       !ID_INTFID type ZINTFMONITOR012-INTFID optional
@@ -30,12 +47,19 @@ public section.
       !ET_LIST type ZTT_ZINTFMONITOR012
     raising
       zcx_intfmonitor .
+  "! <p class="shorttext synchronized" lang="en">Initializes Buffer Data</p>
   class-methods INIT_BUFFER .
+  "! <p class="shorttext synchronized" lang="en">Save Details</p>
+  "!
+  "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
   class-methods SAVE_DETAILS
     importing
       !IS_DETAILS type ZINTFMONITOR012
     raising
       zcx_intfmonitor .
+  "! <p class="shorttext synchronized" lang="en">Save Multiple</p>
+  "!
+  "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
   class-methods SAVE_LIST
     importing
       !IT_LIST type ZTT_ZINTFMONITOR012
@@ -50,14 +74,11 @@ private section.
  PARAM TYPE RANGE OF ZINTFMONITOR012-PARAM ,
         END   OF mtyp_ranges .
 
+  "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
   class-data MS_RANGES type MTYP_RANGES .
+  "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
   class-data MT_BUFFER type ZTT_ZINTFMONITOR012 .
 
-  class-methods _ADD_RANGE
-    importing
-      !ID_LOW type ANY
-    changing
-      !CT_RANGE type ANY TABLE .
 ENDCLASS.
 
 
@@ -181,22 +202,4 @@ SELECT * INTO TABLE et_list
   endmethod.
 
 
-  method _ADD_RANGE.
-
-  FIELD-SYMBOLS: <ls_row>    TYPE any,
-                 <ld_sign>   TYPE any,
-                 <ld_option> TYPE any,
-                 <ld_low>    TYPE any.
-
-  INSERT INITIAL LINE INTO TABLE ct_range ASSIGNING <ls_row>.
-
-ASSIGN COMPONENT 'LOW' OF STRUCTURE <ls_row> TO <ld_low>.
-    <ld_low> = id_low.
-
-ASSIGN COMPONENT 'SIGN' OF STRUCTURE <ls_row> TO <ld_sign>.
-<ld_sign> = 'I'.
-
-ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>.
-<ld_option> = 'EQ'.
-  endmethod.
 ENDCLASS.

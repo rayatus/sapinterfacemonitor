@@ -5,8 +5,7 @@ CLASS zcl_intfmonitor_gui_appl DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_INTFMONITOR_GUI_APPL
-*"* do not include other source files here!!!
+
 
     TYPES:
       "! <p class="shorttext synchronized" lang="en">Filter by</p>
@@ -29,13 +28,13 @@ CLASS zcl_intfmonitor_gui_appl DEFINITION
     "! @parameter is_filters | <p class="shorttext synchronized" lang="en">Filter by</p>
     METHODS search
       IMPORTING
-        !is_filters TYPE mtyp_s_filter_by .
+        !is_filters TYPE mtyp_s_filter_by
+      RAISING
+        zcx_intfmonitor .
   PROTECTED SECTION.
-*"* protected components of class ZCL_INTFMONITOR_GUI_APPL
-*"* do not include other source files here!!!
+
   PRIVATE SECTION.
-*"* private components of class ZCL_INTFMONITOR_GUI_APPL
-*"* do not include other source files here!!!
+
 
     "! <p class="shorttext synchronized" lang="en">Filter by</p>
     DATA ms_filter_by TYPE mtyp_s_filter_by .
@@ -66,7 +65,9 @@ CLASS zcl_intfmonitor_gui_appl DEFINITION
     "! @parameter it_list | <p class="shorttext synchronized" lang="en">List of interface executions</p>
     METHODS initialize
       IMPORTING
-        !it_list TYPE ztt_zintfmonitor030 .
+        !it_list TYPE ztt_zintfmonitor030
+      RAISING
+        zcx_intfmonitor .
     CLASS zcl_zintfmonitor020_read DEFINITION LOAD .
     "! <p class="shorttext synchronized" lang="en">Executes search</p>
     "!
@@ -103,7 +104,7 @@ CLASS zcl_intfmonitor_gui_appl IMPLEMENTATION.
         rows    = 2
         columns = 1
       EXCEPTIONS
-        OTHERS  = 999.
+        OTHERS  = 0.
 
     mo_splitter_horizontal->set_row_height( id = 1 height = 100 ).
     mo_splitter_horizontal->set_row_sash( id    = 1
@@ -123,7 +124,7 @@ CLASS zcl_intfmonitor_gui_appl IMPLEMENTATION.
         rows    = 1
         columns = 2
       EXCEPTIONS
-        OTHERS  = 999.
+        OTHERS  = 0.
 
     mo_container_summary  = mo_splitter_vertical->get_container( row = 1 column = 1 ).
     mo_container_list     = mo_splitter_vertical->get_container( row = 1 column = 2 ).

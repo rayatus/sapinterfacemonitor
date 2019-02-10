@@ -84,21 +84,20 @@ CLASS zcl_intfmonitor_gui_detail DEFINITION
     "! @parameter id_datatype | <p class="shorttext synchronized" lang="en">Data type - processing or returning data</p>
     METHODS build_tree_section
       IMPORTING
-        !id_datatype TYPE zzeintfdatatype .
+        id_datatype TYPE zzeintfdatatype .
     "! <p class="shorttext synchronized" lang="en">Handles ListInterfaceSelected() event</p>
     "!
     "! @parameter io_interface | <p class="shorttext synchronized" lang="en">SAP Interface Monitor</p>
     METHODS display_interface_data
       IMPORTING
-        !io_interface TYPE REF TO zif_intfmonitor
-          PREFERRED PARAMETER io_interface .
+                io_interface TYPE REF TO zif_intfmonitor
+      RAISING   zcx_intfmonitor.
     "! <p class="shorttext synchronized" lang="en">Handles ParameterSelected() event</p>
     "!
     "! @parameter id_param | <p class="shorttext synchronized" lang="en">Parameter</p>
     METHODS display_param_data
-      IMPORTING
-        !id_param TYPE zzeintfdatapar
-          PREFERRED PARAMETER id_param .
+      IMPORTING id_param TYPE zzeintfdatapar
+      RAISING   zcx_intfmonitor.
     "! <p class="shorttext synchronized" lang="en">Handles ContainerResize( ) Event</p>
     METHODS on_container_resize
         FOR EVENT size_control OF cl_gui_container .
@@ -106,25 +105,25 @@ CLASS zcl_intfmonitor_gui_detail DEFINITION
     METHODS on_parameter_selected
           FOR EVENT parameter_selected OF zcl_intfmonitor_gui_detail
       IMPORTING
-          !id_param .
+          id_param .
     "! <p class="shorttext synchronized" lang="en">Handles TreeDoubleClick() event</p>
     METHODS on_tree_double_click
           FOR EVENT double_click OF cl_salv_events_tree
       IMPORTING
-          !node_key
-          !columnname .
+          node_key
+          columnname .
     "! <p class="shorttext synchronized" lang="en">Handles TreeLinkClick() event</p>
     METHODS on_tree_link_click
           FOR EVENT link_click OF cl_salv_events_tree
       IMPORTING
-          !columnname
-          !node_key .
+          columnname
+          node_key .
     "! <p class="shorttext synchronized" lang="en">Raises parameter selected event</p>
     "!
     "! @parameter io_node | <p class="shorttext synchronized" lang="en">Single Node Object of Tree Structure</p>
     METHODS raise_parameter_selected
       IMPORTING
-        !io_node TYPE REF TO cl_salv_node .
+        io_node TYPE REF TO cl_salv_node .
 ENDCLASS.
 
 
@@ -158,7 +157,11 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
       ENDTRY.
     ELSE.
       lf_new = abap_false.
-      mo_grid->set_data( CHANGING t_table = it_data ).
+      TRY.
+          mo_grid->set_data( CHANGING t_table = it_data ).
+        CATCH cx_salv_no_new_data_allowed.
+          "Do nothing
+      ENDTRY.
     ENDIF.
 
 * Prepare Grid buttons
@@ -304,7 +307,11 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
 *   It's not necessary to build once again Tree, just delete its content
 *   and insert new data
       lo_nodes = mo_tree->get_nodes( ).
-      lo_nodes->delete_all( ).
+      TRY.
+          lo_nodes->delete_all( ).
+        CATCH cx_salv_error.
+          "Do nothing
+      ENDTRY.
     ELSE.
 *   It's necessary to create new tree
       TRY.
@@ -383,23 +390,29 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
       ld_text = ld_dom_text = zcl_intfmonitor_util=>get_domain_text( id_domname = 'ZZDINTFDATATYPE' id_value = id_datatype ).
 
       CLEAR: ld_node_key.
-      lo_node  = lo_nodes->add_node( related_node = ld_node_key
-                                     relationship = cl_gui_column_tree=>relat_last_child
-                                     folder       = abap_true
-                                     expander     = abap_true
-                                     text         = ld_text ).
-      lo_node->expand( ).
-      ld_node_key = lo_node->get_key( ).
+      TRY.
+          lo_node  = lo_nodes->add_node( related_node = ld_node_key
+                                         relationship = cl_gui_column_tree=>relat_last_child
+                                         folder       = abap_true
+                                         expander     = abap_true
+                                         text         = ld_text ).
 
-      LOOP AT mt_tree_data INTO ls_tree_data WHERE datatype = id_datatype.
-        ld_text = ls_tree_data-param.
-        lo_node = lo_nodes->add_node( related_node = ld_node_key
-                                      relationship = cl_gui_column_tree=>relat_last_child
-                                      text         = ld_text
-                                      data_row     = ls_tree_data ).
-        lo_item = lo_node->get_hierarchy_item( ).
-        lo_item->set_type( if_salv_c_item_type=>link ).
-      ENDLOOP.
+          lo_node->expand( ).
+
+          ld_node_key = lo_node->get_key( ).
+
+          LOOP AT mt_tree_data INTO ls_tree_data WHERE datatype = id_datatype.
+            ld_text = ls_tree_data-param.
+            lo_node = lo_nodes->add_node( related_node = ld_node_key
+                                          relationship = cl_gui_column_tree=>relat_last_child
+                                          text         = ld_text
+                                          data_row     = ls_tree_data ).
+            lo_item = lo_node->get_hierarchy_item( ).
+            lo_item->set_type( if_salv_c_item_type=>link ).
+          ENDLOOP.
+        CATCH cx_salv_msg.
+          "Do nothing
+      ENDTRY.
     ENDIF.
 
 
@@ -446,7 +459,8 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
           lo_abap_descr   TYPE REF TO cl_abap_datadescr,
           lt_components   TYPE abap_component_tab,
           lr_data         TYPE REF TO data,
-          lr_row          TYPE REF TO data.
+          lr_row          TYPE REF TO data,
+          ld_counter      TYPE i.
 
     FIELD-SYMBOLS: <lr_data>      TYPE any,
                    <lt_data>      TYPE ANY TABLE,
@@ -502,6 +516,7 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
         ASSIGN mr_grid_data->* TO <lt_data>.
 
         <ls_data> = <lr_data>.
+
         INSERT <ls_data> INTO TABLE <lt_data>.
     ENDCASE.
 
@@ -528,14 +543,22 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
 
   METHOD on_list_interface_selected.
 
-    display_interface_data( io_interface ).
+    TRY.
+        display_interface_data( io_interface ).
+      CATCH zcx_intfmonitor.
+        "Do nothing
+    ENDTRY.
 
   ENDMETHOD.
 
 
   METHOD on_parameter_selected.
 
-    display_param_data( id_param = id_param   ).
+    TRY.
+        display_param_data( id_param = id_param   ).
+      CATCH zcx_intfmonitor.
+        "Do nothing
+    ENDTRY.
 
   ENDMETHOD.
 

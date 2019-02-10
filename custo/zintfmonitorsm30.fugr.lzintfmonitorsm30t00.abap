@@ -1,0 +1,48 @@
+*---------------------------------------------------------------------*
+*    view related data declarations
+*   generation date: 09.02.2019 at 23:11:40
+*   view maintenance generator version: #001407#
+*---------------------------------------------------------------------*
+*...processing: ZVINTFMONITOR...................................*
+TABLES: ZVINTFMONITOR, *ZVINTFMONITOR. "view work areas
+CONTROLS: TCTRL_ZVINTFMONITOR
+TYPE TABLEVIEW USING SCREEN '0002'.
+DATA: BEGIN OF STATUS_ZVINTFMONITOR. "state vector
+          INCLUDE STRUCTURE VIMSTATUS.
+DATA: END OF STATUS_ZVINTFMONITOR.
+* Table for entries selected to show on screen
+DATA: BEGIN OF ZVINTFMONITOR_EXTRACT OCCURS 0010.
+INCLUDE STRUCTURE ZVINTFMONITOR.
+          INCLUDE STRUCTURE VIMFLAGTAB.
+DATA: END OF ZVINTFMONITOR_EXTRACT.
+* Table for all entries loaded from database
+DATA: BEGIN OF ZVINTFMONITOR_TOTAL OCCURS 0010.
+INCLUDE STRUCTURE ZVINTFMONITOR.
+          INCLUDE STRUCTURE VIMFLAGTAB.
+DATA: END OF ZVINTFMONITOR_TOTAL.
+
+*...processing: ZVINTFMONITORPAR................................*
+TABLES: ZVINTFMONITORPAR, *ZVINTFMONITORPAR. "view work areas
+CONTROLS: TCTRL_ZVINTFMONITORPAR
+TYPE TABLEVIEW USING SCREEN '0001'.
+DATA: BEGIN OF STATUS_ZVINTFMONITORPAR. "state vector
+          INCLUDE STRUCTURE VIMSTATUS.
+DATA: END OF STATUS_ZVINTFMONITORPAR.
+* Table for entries selected to show on screen
+DATA: BEGIN OF ZVINTFMONITORPAR_EXTRACT OCCURS 0010.
+INCLUDE STRUCTURE ZVINTFMONITORPAR.
+          INCLUDE STRUCTURE VIMFLAGTAB.
+DATA: END OF ZVINTFMONITORPAR_EXTRACT.
+* Table for all entries loaded from database
+DATA: BEGIN OF ZVINTFMONITORPAR_TOTAL OCCURS 0010.
+INCLUDE STRUCTURE ZVINTFMONITORPAR.
+          INCLUDE STRUCTURE VIMFLAGTAB.
+DATA: END OF ZVINTFMONITORPAR_TOTAL.
+
+*.........table declarations:.................................*
+TABLES: SEOCLASS                       .
+TABLES: SEOCLASSTX                     .
+TABLES: ZINTFMONITOR010                .
+TABLES: ZINTFMONITOR011                .
+TABLES: ZINTFMONITOR012                .
+TABLES: ZINTFMONITOR013                .

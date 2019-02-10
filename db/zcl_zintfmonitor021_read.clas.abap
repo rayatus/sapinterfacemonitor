@@ -1,202 +1,202 @@
-class ZCL_ZINTFMONITOR021_READ definition
-  public
-  create private .
+"! <p class="shorttext synchronized" lang="en">Interface executions Data</p>
+CLASS zcl_zintfmonitor021_read DEFINITION
+  PUBLIC
+  CREATE PRIVATE INHERITING FROM zcl_zintfmonitor_base_read.
 
-public section.
+  PUBLIC SECTION.
 
-  class-methods DELETE_DETAILS
-    importing
-      !IS_DETAILS type ZINTFMONITOR021
-    raising
-      zcx_intfmonitor .
-  class-methods DELETE_LIST
-    importing
-      !IT_LIST type ZTT_ZINTFMONITOR021
-    raising
-      zcx_intfmonitor .
-  class-methods GET_DETAILS
-    importing
-      !ID_GUID type ZINTFMONITOR021-GUID
-      !ID_ITEM type ZINTFMONITOR021-ITEM
-    returning
-      value(RS_RESULT) type ZINTFMONITOR021
-    raising
-      zcx_intfmonitor .
-  class-methods GET_LIST
-    importing
-      !ID_GUID type ZINTFMONITOR021-GUID optional
-      !ID_ITEM type ZINTFMONITOR021-ITEM optional
-    exporting
-      !ET_LIST type ZTT_ZINTFMONITOR021
-    raising
-      zcx_intfmonitor .
-  class-methods INIT_BUFFER .
-  class-methods SAVE_DETAILS
-    importing
-      !IS_DETAILS type ZINTFMONITOR021
-    raising
-      zcx_intfmonitor .
-  class-methods SAVE_LIST
-    importing
-      !IT_LIST type ZTT_ZINTFMONITOR021
-    raising
-      zcx_intfmonitor .
-protected section.
-private section.
+    "! <p class="shorttext synchronized" lang="en">Delete Details</p>
+    "!
+    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
+    CLASS-METHODS delete_details
+      IMPORTING
+        !is_details TYPE zintfmonitor021
+      RAISING
+        zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Delete Multiple</p>
+    "!
+    "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
+    CLASS-METHODS delete_list
+      IMPORTING
+        !it_list TYPE ztt_zintfmonitor021
+      RAISING
+        zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Find details by keys</p>
+    "!
+    "! @parameter id_guid   | <p class="shorttext synchronized" lang="en">Process Id</p>
+    "! @parameter id_item   | <p class="shorttext synchronized" lang="en">Item</p>
+    "! @parameter rs_result | <p class="shorttext synchronized" lang="en">Details</p>
+    CLASS-METHODS get_details
+      IMPORTING
+        !id_guid         TYPE zintfmonitor021-guid
+        !id_item         TYPE zintfmonitor021-item
+      RETURNING
+        VALUE(rs_result) TYPE zintfmonitor021
+      RAISING
+        zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Find Multiple details by keys</p>
+    "!
+    "! @parameter id_guid | <p class="shorttext synchronized" lang="en">Process Id</p>
+    "! @parameter id_item | <p class="shorttext synchronized" lang="en">Item</p>
+    "! @parameter et_list | <p class="shorttext synchronized" lang="en">List Details</p>
+    CLASS-METHODS get_list
+      IMPORTING
+        !id_guid TYPE zintfmonitor021-guid OPTIONAL
+        !id_item TYPE zintfmonitor021-item OPTIONAL
+      EXPORTING
+        !et_list TYPE ztt_zintfmonitor021
+      RAISING
+        zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Initializes Buffer Data</p>
+    CLASS-METHODS init_buffer .
+    "! <p class="shorttext synchronized" lang="en">Save Details</p>
+    "!
+    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
+    CLASS-METHODS save_details
+      IMPORTING
+        !is_details TYPE zintfmonitor021
+      RAISING
+        zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Save Multiple</p>
+    "!
+    "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
+    CLASS-METHODS save_list
+      IMPORTING
+        !it_list TYPE ztt_zintfmonitor021
+      RAISING
+        zcx_intfmonitor .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 
-  types:
-     BEGIN OF mtyp_ranges,
- GUID TYPE RANGE OF ZINTFMONITOR021-GUID ,
- ITEM TYPE RANGE OF ZINTFMONITOR021-ITEM ,
-        END   OF mtyp_ranges .
+    TYPES:
+      BEGIN OF mtyp_ranges,
+        guid TYPE RANGE OF zintfmonitor021-guid,
+        item TYPE RANGE OF zintfmonitor021-item,
+      END   OF mtyp_ranges .
 
-  class-data MS_RANGES type MTYP_RANGES .
-  class-data MT_BUFFER type ZTT_ZINTFMONITOR021 .
+    "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
+    CLASS-DATA ms_ranges TYPE mtyp_ranges .
+    "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
+    CLASS-DATA mt_buffer TYPE ztt_zintfmonitor021 .
 
-  class-methods _ADD_RANGE
-    importing
-      !ID_LOW type ANY
-    changing
-      !CT_RANGE type ANY TABLE .
 ENDCLASS.
 
 
 
-CLASS ZCL_ZINTFMONITOR021_READ IMPLEMENTATION.
+CLASS zcl_zintfmonitor021_read IMPLEMENTATION.
 
 
-  method DELETE_DETAILS.
-  DATA lt_list      TYPE ZTT_ZINTFMONITOR021 .
-  DATA ls_list      LIKE LINE OF lt_list.
-  DATA lo_exception TYPE REF TO  zcx_intfmonitor.
+  METHOD delete_details.
+    DATA lt_list      TYPE ztt_zintfmonitor021 .
+    DATA ls_list      LIKE LINE OF lt_list.
 
-  CHECK is_details IS NOT INITIAL.
-  TRY .
-      MOVE-CORRESPONDING is_details TO ls_list.
-      INSERT ls_list INTO TABLE lt_list[].
-      delete_list( lt_list[] ).
-    CATCH zcx_intfmonitor INTO lo_exception.
-      RAISE EXCEPTION lo_exception.
-  ENDTRY.
-  endmethod.
-
-
-  method DELETE_LIST.
-
-  CHECK it_list[] IS NOT INITIAL.
-  DELETE ZINTFMONITOR021  FROM TABLE it_list.
-
-  IF NOT sy-subrc IS INITIAL.
-    RAISE EXCEPTION TYPE zcx_intfmonitor.
-  ENDIF.
-  endmethod.
-
-
-  method GET_DETAILS.
-
-  DATA lt_list      TYPE ZTT_ZINTFMONITOR021 .
-  DATA ls_list      LIKE LINE OF lt_list.
-  DATA lo_exception TYPE REF TO zcx_intfmonitor.
-
-  READ TABLE mt_buffer INTO rs_result
-    WITH KEY GUID = ID_GUID
-						 ITEM = ID_ITEM.
-
-  IF NOT sy-subrc IS INITIAL.
-
-    TRY.
-        get_list( EXPORTING  ID_GUID = ID_GUID
-														 ID_ITEM = ID_ITEM
-                  IMPORTING  et_list = lt_list ).
-
-      READ TABLE lt_list INDEX 1 INTO ls_list.
-      MOVE-CORRESPONDING ls_list TO rs_result.
-
-      CATCH zcx_intfmonitor INTO lo_exception.
+    CHECK is_details IS NOT INITIAL.
+    TRY .
+        MOVE-CORRESPONDING is_details TO ls_list.
+        INSERT ls_list INTO TABLE lt_list[].
+        delete_list( lt_list[] ).
+      CATCH zcx_intfmonitor INTO data(lo_exception).
         RAISE EXCEPTION lo_exception.
     ENDTRY.
-
-  ENDIF.
-  endmethod.
+  ENDMETHOD.
 
 
-  method GET_LIST.
+  METHOD delete_list.
 
-  CLEAR ms_ranges.
+    CHECK it_list[] IS NOT INITIAL.
+    DELETE zintfmonitor021  FROM TABLE it_list.
 
-  IF ID_GUID IS SUPPLIED.
-    _add_range( EXPORTING id_low   = ID_GUID
-                CHANGING  ct_range = ms_ranges-GUID ).
-  ENDIF.
-
-  IF ID_ITEM IS SUPPLIED.
-    _add_range( EXPORTING id_low   = ID_ITEM
-                CHANGING  ct_range = ms_ranges-ITEM ).
-  ENDIF.
-
-SELECT * INTO TABLE et_list
-  FROM ZINTFMONITOR021
-  WHERE GUID IN ms_ranges-GUID
-    AND ITEM IN ms_ranges-ITEM.
-
-  INSERT LINES OF et_list INTO TABLE mt_buffer.
-  SORT mt_buffer.
-  DELETE ADJACENT DUPLICATES FROM mt_buffer.
-
-  IF et_list IS INITIAL.
-    RAISE EXCEPTION TYPE zcx_intfmonitor.
-  ENDIF.
-  endmethod.
+    IF NOT sy-subrc IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
+    ENDIF.
+  ENDMETHOD.
 
 
-  method INIT_BUFFER.
-  CLEAR mt_buffer[].
-  endmethod.
+  METHOD get_details.
+
+    DATA lt_list      TYPE ztt_zintfmonitor021 .
+    DATA ls_list      LIKE LINE OF lt_list.
+    DATA lo_exception TYPE REF TO zcx_intfmonitor.
+
+    READ TABLE mt_buffer INTO rs_result
+      WITH KEY guid = id_guid
+  						 item = id_item.
+
+    IF NOT sy-subrc IS INITIAL.
+
+      TRY.
+          get_list( EXPORTING  id_guid = id_guid
+  														 id_item = id_item
+                    IMPORTING  et_list = lt_list ).
+
+          READ TABLE lt_list INDEX 1 INTO ls_list.
+          MOVE-CORRESPONDING ls_list TO rs_result.
+
+        CATCH zcx_intfmonitor INTO lo_exception.
+          RAISE EXCEPTION lo_exception.
+      ENDTRY.
+
+    ENDIF.
+  ENDMETHOD.
 
 
-  method SAVE_DETAILS.
-  DATA lt_list type ZTT_ZINTFMONITOR021 .
-  DATA ls_list like line of lt_list.
-  DATA lo_exception TYPE REF TO zcx_intfmonitor.
+  METHOD get_list.
 
-  CHECK is_details IS NOT INITIAL.
-  TRY .
-      MOVE-CORRESPONDING is_details TO ls_list.
-      INSERT ls_list INTO TABLE lt_list[].
-      save_list( lt_list[] ).
-    CATCH zcx_intfmonitor INTO lo_exception.
-      RAISE EXCEPTION lo_exception.
-  ENDTRY.
-  endmethod.
+    CLEAR ms_ranges.
+
+    IF id_guid IS SUPPLIED.
+      _add_range( EXPORTING id_low   = id_guid
+                  CHANGING  ct_range = ms_ranges-guid ).
+    ENDIF.
+
+    IF id_item IS SUPPLIED.
+      _add_range( EXPORTING id_low   = id_item
+                  CHANGING  ct_range = ms_ranges-item ).
+    ENDIF.
+
+    SELECT * INTO TABLE et_list
+      FROM zintfmonitor021
+      WHERE guid IN ms_ranges-guid
+        AND item IN ms_ranges-item.
+
+    INSERT LINES OF et_list INTO TABLE mt_buffer.
+    SORT mt_buffer.
+    DELETE ADJACENT DUPLICATES FROM mt_buffer.
+
+    IF et_list IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
+    ENDIF.
+  ENDMETHOD.
 
 
-  method SAVE_LIST.
-
-  CHECK it_list[] IS NOT INITIAL.
-  MODIFY ZINTFMONITOR021  FROM TABLE it_list.
-
-  IF NOT sy-subrc IS INITIAL.
-    RAISE EXCEPTION TYPE zcx_intfmonitor.
-  ENDIF.
-  endmethod.
+  METHOD init_buffer.
+    CLEAR mt_buffer[].
+  ENDMETHOD.
 
 
-  method _ADD_RANGE.
+  METHOD save_details.
+    DATA lt_list TYPE ztt_zintfmonitor021 .
+    DATA ls_list LIKE LINE OF lt_list.
 
-  FIELD-SYMBOLS: <ls_row>    TYPE any,
-                 <ld_sign>   TYPE any,
-                 <ld_option> TYPE any,
-                 <ld_low>    TYPE any.
+    CHECK is_details IS NOT INITIAL.
+    TRY .
+        MOVE-CORRESPONDING is_details TO ls_list.
+        INSERT ls_list INTO TABLE lt_list[].
+        save_list( lt_list[] ).
+      CATCH zcx_intfmonitor INTO data(lo_exception).
+        RAISE EXCEPTION lo_exception.
+    ENDTRY.
+  ENDMETHOD.
 
-  INSERT INITIAL LINE INTO TABLE ct_range ASSIGNING <ls_row>.
 
-ASSIGN COMPONENT 'LOW' OF STRUCTURE <ls_row> TO <ld_low>.
-    <ld_low> = id_low.
+  METHOD save_list.
 
-ASSIGN COMPONENT 'SIGN' OF STRUCTURE <ls_row> TO <ld_sign>.
-<ld_sign> = 'I'.
+    CHECK it_list[] IS NOT INITIAL.
+    MODIFY zintfmonitor021  FROM TABLE it_list.
 
-ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>.
-<ld_option> = 'EQ'.
-  endmethod.
+    IF NOT sy-subrc IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
+    ENDIF.
+  ENDMETHOD.
+
 ENDCLASS.

@@ -1,8 +1,3 @@
-*----------------------------------------------------------------------*
-*       CLASS ZCL_INTFMONITOR_UTIL DEFINITION
-*----------------------------------------------------------------------*
-*
-*----------------------------------------------------------------------*
 "! <p class="shorttext synchronized" lang="en">SAP Interface Monitor - Utilities</p>
 CLASS zcl_intfmonitor_util DEFINITION
   PUBLIC
@@ -10,8 +5,6 @@ CLASS zcl_intfmonitor_util DEFINITION
   CREATE PRIVATE .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_INTFMONITOR_UTIL
-*"* do not include other source files here!!!
 
     TYPES:
       BEGIN OF mtyp_s_intf_param,
@@ -30,25 +23,21 @@ CLASS zcl_intfmonitor_util DEFINITION
     "! @parameter id_value   | <p class="shorttext synchronized" lang="en">Values for Domains: Single Value / Upper Limit</p>
     "! @parameter rd_text    | <p class="shorttext synchronized" lang="en">Short Text for Fixed Values</p>
     CLASS-METHODS get_domain_text
-      IMPORTING
-        !id_domname    TYPE dd07v-domname
-        !id_value      TYPE any
-      RETURNING
-        VALUE(rd_text) TYPE dd07v-ddtext .
+      IMPORTING id_domname     TYPE dd07v-domname
+                id_value       TYPE any
+      RETURNING VALUE(rd_text) TYPE dd07v-ddtext .
     "! <p class="shorttext synchronized" lang="en">Gets Interface parameter definition</p>
     "!
     "! @parameter io_interface | <p class="shorttext synchronized" lang="en">SAP Interface Monitor</p>
+    "! @parameter et_definition | <p class="shorttext synchronized" lang="en">Param list information</p>
     CLASS-METHODS get_interface_param_definition
-      IMPORTING
-        !io_interface  TYPE REF TO zif_intfmonitor
-      EXPORTING
-        !et_definition TYPE mtyp_t_intf_param .
+      IMPORTING io_interface  TYPE REF TO zif_intfmonitor
+      EXPORTING et_definition TYPE mtyp_t_intf_param .
+
   PROTECTED SECTION.
-*"* protected components of class ZCL_INTFMONITOR_UTIL
-*"* do not include other source files here!!!
+
   PRIVATE SECTION.
-*"* private components of class ZCL_INTFMONITOR_UTIL
-*"* do not include other source files here!!!
+
 ENDCLASS.
 
 
@@ -62,12 +51,12 @@ CLASS zcl_intfmonitor_util IMPLEMENTATION.
     ld_value = id_value.
     CALL FUNCTION 'SXMS_GET_DOMAIN_TEXT'
       EXPORTING
-        domname       = id_domname
-        value         = ld_value
+        domname = id_domname
+        value   = ld_value
       IMPORTING
-        text          = rd_text
+        text    = rd_text
       EXCEPTIONS
-        illegal_input = 1.
+        OTHERS  = 999.
 
   ENDMETHOD.
 
@@ -87,7 +76,7 @@ CLASS zcl_intfmonitor_util IMPLEMENTATION.
         zcl_zintfmonitor012_read=>get_list( EXPORTING id_intfid = io_interface->ms_detail-intfid
                                             IMPORTING et_list   = lt_list ).
 
-      CATCH cx_db2_not_found .
+      CATCH zcx_intfmonitor .
 *     Do nothing
     ENDTRY.
 
@@ -96,16 +85,15 @@ CLASS zcl_intfmonitor_util IMPLEMENTATION.
       <ls_definition>-param     = <ls_list>-param.
       <ls_definition>-datatype  = <ls_list>-datatype.
       <ls_definition>-paramtype = <ls_list>-paramtype.
-      <ls_definition>-xdatatype = get_domain_text( id_domname = 'ZZDINTFDATATYPE'
-                                                   id_value   = <ls_definition>-datatype ).
+      <ls_definition>-xdatatype = get_domain_text( id_domname = 'ZZDINTFDATATYPE'  id_value   = <ls_definition>-datatype ). "#EC NOTEXT
 
       TRY.
           ls_details = zcl_zintfmonitor013_read=>get_details( id_intfid = io_interface->ms_detail-intfid
                                                               id_spras  = sy-langu
                                                               id_param  = <ls_list>-param ).
           <ls_definition>-xparam = ls_details-xparam.
-        CATCH cx_db2_not_found .
-*     Do nothing
+        CATCH zcx_intfmonitor .
+*         Do nothing
       ENDTRY.
     ENDLOOP.
 

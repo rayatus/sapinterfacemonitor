@@ -5,8 +5,6 @@ CLASS zcf_intfmonitor DEFINITION
   CREATE PRIVATE .
 
   PUBLIC SECTION.
-*"* public components of class ZCF_INTFMONITOR
-*"* do not include other source files here!!!
 
     "! <p class="shorttext synchronized" lang="en">Creates new Interface Monitor to store data</p>
     "!
@@ -37,11 +35,9 @@ CLASS zcf_intfmonitor DEFINITION
         not_found
         unable_to_create_instance .
   PROTECTED SECTION.
-*"* protected components of class ZCF_INTFMONITOR
-*"* do not include other source files here!!!
+
   PRIVATE SECTION.
-*"* private components of class ZCF_INTFMONITOR
-*"* do not include other source files here!!!
+
 ENDCLASS.
 
 
@@ -54,8 +50,8 @@ CLASS zcf_intfmonitor IMPLEMENTATION.
           ls_custo TYPE zintfmonitor010.
 
     TRY.
-        ls_head  = zcl_zintfmonitor020_read=>get_detail( id_guid ).
-        ls_custo = zcl_zintfmonitor010_read=>get_detail( ls_head-intfid ).
+        ls_head  = zcl_zintfmonitor020_read=>get_details( id_guid ).
+        ls_custo = zcl_zintfmonitor010_read=>get_details( ls_head-intfid ).
 
         CREATE OBJECT ro_instance TYPE (ls_custo-clsname).
 
@@ -64,7 +60,7 @@ CLASS zcf_intfmonitor IMPLEMENTATION.
 *     Retrieve saved data
         ro_instance->read( ).
 
-      CATCH cx_db2_not_found .
+      CATCH ZCX_INTFMONITOR .
         MESSAGE e000(zintfmonitor) WITH id_guid RAISING not_found.
 *     There is no Interface execution with id '&1'.
       CATCH cx_sy_create_object_error.
@@ -84,7 +80,7 @@ CLASS zcf_intfmonitor IMPLEMENTATION.
           ls_detail TYPE zeintfmonitor_detail.
 
     TRY.
-        ls_custo = zcl_zintfmonitor010_read=>get_detail( id_intfid ).
+        ls_custo = zcl_zintfmonitor010_read=>get_details( id_intfid ).
 
         CREATE OBJECT ro_instance TYPE (ls_custo-clsname).
 
@@ -97,7 +93,7 @@ CLASS zcf_intfmonitor IMPLEMENTATION.
         ro_instance->initialize( EXPORTING id_guid   = ld_guid
                                            is_detail = ls_detail ).
 
-      CATCH cx_db2_not_found .
+      CATCH ZCX_INTFMONITOR .
         MESSAGE e001(zintfmonitor) WITH id_intfid RAISING not_found.
 *     Interface id '&1' does not exist.
 

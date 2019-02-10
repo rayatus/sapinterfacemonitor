@@ -6,8 +6,7 @@ CLASS zcl_intfmonitor_rfc DEFINITION
   GLOBAL FRIENDS zcf_intfmonitor .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_INTFMONITOR_RFC
-*"* do not include other source files here!!!
+
 
     INTERFACES zif_intfmonitor .
 
@@ -31,8 +30,7 @@ CLASS zcl_intfmonitor_rfc DEFINITION
     "! <p class="shorttext synchronized" lang="en">CONSTRUCTOR</p>
     METHODS constructor .
   PROTECTED SECTION.
-*"* protected components of class ZCL_INTFMONITOR_RFC
-*"* do not include other source files here!!!
+
 
     TYPES:
       "! <p class="shorttext synchronized" lang="en">Interface Parameter</p>
@@ -44,11 +42,22 @@ CLASS zcl_intfmonitor_rfc DEFINITION
     "! <p class="shorttext synchronized" lang="en">Interface Parameters</p>
     TYPES mtyp_t_intfparameters TYPE SORTED TABLE OF mtyp_s_intfparameter WITH UNIQUE KEY param.
   PRIVATE SECTION.
-*"* private components of class ZCL_INTFMONITOR_RFC
-*"* do not include other source files here!!!
 
     "! <p class="shorttext synchronized" lang="en">SAP Interface Monitor - Data container</p>
     DATA mo_data_container TYPE REF TO zcl_intfmonitor_data_container .
+
+    "! <p class="shorttext synchronized" lang="en">Maps data container execution parameters to parameter list</p>
+    "!
+    "! @parameter ct_parameters | Parameters list values
+    METHODS _map_datacontainer_to_params
+      CHANGING ct_parameters TYPE ztt_zintfmonitor021.
+
+    "! <p class="shorttext synchronized" lang="en">Maps execution parameter list values to data container</p>
+    "!
+    "! @parameter it_parameters | Parameters list values
+    METHODS _map_params_to_datacontainer
+      IMPORTING it_parameters TYPE ztt_zintfmonitor021.
+
 ENDCLASS.
 
 
@@ -93,8 +102,8 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
     TRY.
         ls_intf_x = zcl_zintfmonitor010_read=>get_detail_x( rs_detail_x-detail-intfid  ).
         rs_detail_x-xintfid = ls_intf_x-xintfid.
-      CATCH cx_db2_not_found .
-*   Do nothing
+      CATCH zcx_intfmonitor  .
+      rs_detail_x-xintfid = |< { rs_detail_x-intfid } >|.
     ENDTRY.
 
 
@@ -115,18 +124,24 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
   METHOD zif_intfmonitor~get_parameter.
     DATA: ld_string TYPE string.
 
+    CLEAR sy-subrc.
+
     ld_string = id_param.
 
-    IF er_data IS REQUESTED.
+    IF er_data IS REQUESTED AND sy-subrc IS INITIAL.
       mo_data_container->get( EXPORTING id_id   = ld_string
                               IMPORTING er_data = er_data
                               EXCEPTIONS OTHERS = 999 ).
     ENDIF.
 
-    IF ex_val IS REQUESTED.
+    IF ex_val IS REQUESTED AND sy-subrc IS INITIAL.
       mo_data_container->get( EXPORTING id_id   = ld_string
                               IMPORTING ed_data = ex_val
                               EXCEPTIONS OTHERS = 999 ).
+    ENDIF.
+
+    IF sy-subrc IS NOT INITIAL.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
     ENDIF.
 
   ENDMETHOD.
@@ -141,56 +156,73 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
 
 
   METHOD zif_intfmonitor~read.
-    DATA: ls_head           TYPE zintfmonitor020,
-          lt_item           TYPE ztt_zintfmonitor021,
-          lt_item_param     TYPE ztt_zintfmonitor021,
-          ld_previous_param TYPE zzeintfdatapar,
-          lt_intfparameters TYPE ztt_zintfmonitor012,
-          lo_type_descr     TYPE REF TO cl_abap_typedescr,
+
+
+*     Read execution data
+    DATA(ls_head)   = zcl_zintfmonitor020_read=>get_details( id_guid = md_guid ).
+
+    md_guid   = ls_head-guid.
+    ms_detail = ls_head-detail.
+
+*     Read Interface data values
+    TRY.
+        zcl_zintfmonitor021_read=>get_list( EXPORTING id_guid = md_guid
+                                            IMPORTING et_list = DATA(lt_item) ).
+        _map_params_to_datacontainer( EXPORTING it_parameters = lt_item ).
+      CATCH  zcx_intfmonitor.
+        "No parameters -> Do nothing
+    ENDTRY.
+
+
+
+  ENDMETHOD.
+
+
+  METHOD zif_intfmonitor~store.
+
+    DATA: ls_head TYPE zintfmonitor020,
+          lt_item TYPE ztt_zintfmonitor021.
+
+*     Store execution data
+    ls_head-guid   = md_guid.
+    ls_head-detail = ms_detail.
+    zcl_zintfmonitor020_read=>save_details( ls_head ).
+
+*     Store Interface data values
+    _map_datacontainer_to_params( CHANGING ct_parameters = lt_item ).
+    zcl_zintfmonitor021_read=>save_list( it_list = lt_item ).
+
+  ENDMETHOD.
+
+  METHOD _map_params_to_datacontainer.
+
+    DATA: lt_item_param     LIKE it_parameters,
           lo_abap_descr     TYPE REF TO cl_abap_datadescr,
-          lo_elem_descr     TYPE REF TO cl_abap_elemdescr,
-          lo_struct_descr   TYPE REF TO cl_abap_structdescr,
           lo_table_descr    TYPE REF TO cl_abap_tabledescr,
           ld_lines          TYPE i,
           ld_id             TYPE string,
           ld_ref_data       TYPE REF TO data,
           ld_ref_table_data TYPE REF TO data.
 
-    FIELD-SYMBOLS: <ls_item>          LIKE LINE OF lt_item,
-                   <ls_intfparameter> LIKE LINE OF lt_intfparameters,
-                   <ls_data_row>      TYPE any,
-                   <ls_data_table>    TYPE table.
+    FIELD-SYMBOLS: <ls_data_row>   TYPE any,
+                   <lt_data_table> TYPE ANY TABLE.
 
+    "Read Customized Interface Parameters
     TRY.
-*     Read execution data
-        ls_head   = zcl_zintfmonitor020_read=>get_detail( id_guid = md_guid ).
-
-        md_guid   = ls_head-guid.
-        ms_detail = ls_head-detail.
-
-*     Read Interface data values
-        zcl_zintfmonitor021_read=>get_list( EXPORTING id_guid = md_guid
-                                            IMPORTING et_list = lt_item ).
-
-*     Read Customized Interface Parameters
         zcl_zintfmonitor012_read=>get_list( EXPORTING id_intfid = ms_detail-intfid
-                                            IMPORTING et_list   = lt_intfparameters ).
-
-      CATCH cx_db2_not_found .
-*     Do nothing
+                                            IMPORTING et_list   = DATA(lt_custo_intfparameters) ).
+      CATCH zcx_intfmonitor.
+        "Do nothing
     ENDTRY.
 
-*--------------------------------------------------------------------*
-* Map DB Structures to DataContainer
-*--------------------------------------------------------------------*
-    LOOP AT lt_intfparameters ASSIGNING <ls_intfparameter>.
-      ld_id           = <ls_intfparameter>-param.
+    LOOP AT lt_custo_intfparameters ASSIGNING FIELD-SYMBOL(<ls_custo_intfparameter>).
+      ld_id           = <ls_custo_intfparameter>-param.
 
-      lt_item_param[] = lt_item[].
-      DELETE lt_item_param WHERE param <> <ls_intfparameter>-param.
+      lt_item_param[] = it_parameters[].
+      DELETE lt_item_param WHERE param <> <ls_custo_intfparameter>-param.
       DESCRIBE TABLE lt_item_param  LINES ld_lines.
 
-      lo_type_descr = cl_abap_typedescr=>describe_by_name( <ls_intfparameter>-paramtype ).
+      DATA(lo_type_descr) = cl_abap_typedescr=>describe_by_name( <ls_custo_intfparameter>-paramtype ).
 
 
       IF ld_lines = 1.
@@ -201,7 +233,7 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
         CREATE DATA ld_ref_data TYPE HANDLE lo_abap_descr.
         ASSIGN ld_ref_data->* TO <ls_data_row>.
 
-        READ TABLE lt_item_param INDEX 1 ASSIGNING <ls_item>.
+        READ TABLE lt_item_param INDEX 1 ASSIGNING FIELD-SYMBOL(<ls_item>).
         cl_abap_container_utilities=>read_container_c( EXPORTING  im_container           = <ls_item>-dataval
                                                        IMPORTING  ex_value               = <ls_data_row>
                                                        EXCEPTIONS illegal_parameter_type = 1 ).
@@ -214,99 +246,69 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
         lo_table_descr ?= lo_type_descr.
 *      lo_table_descr = cl_abap_tabledescr=>create( p_line_type = lo_abap_descr ).
         CREATE DATA ld_ref_table_data TYPE HANDLE lo_table_descr.
-        ASSIGN ld_ref_table_data->* TO <ls_data_table>.
+        ASSIGN ld_ref_table_data->* TO <lt_data_table>.
 
         LOOP AT lt_item_param ASSIGNING <ls_item>.
-          INSERT INITIAL LINE INTO TABLE <ls_data_table> ASSIGNING <ls_data_row>.
+          INSERT INITIAL LINE INTO TABLE <lt_data_table> ASSIGNING <ls_data_row>.
           cl_abap_container_utilities=>read_container_c( EXPORTING  im_container           = <ls_item>-dataval
                                                          IMPORTING  ex_value               = <ls_data_row>
                                                          EXCEPTIONS illegal_parameter_type = 1 ).
 
         ENDLOOP.
         mo_data_container->add( id_id   = ld_id
-                               id_data = <ls_data_table> ).
+                               id_data = <lt_data_table> ).
 
       ENDIF.
     ENDLOOP.
-
   ENDMETHOD.
 
+  METHOD _map_datacontainer_to_params.
+    DATA: ld_id           TYPE string,
+          ld_item_counter TYPE zintfmonitor021-item.
 
-  METHOD zif_intfmonitor~store.
+    FIELD-SYMBOLS: <lt_data_table> TYPE ANY TABLE,
+                   <ls_item>       LIKE LINE OF ct_parameters.
 
-    DATA: ls_head           TYPE zintfmonitor020,
-          lt_item           TYPE ztt_zintfmonitor021,
-          ld_previous_param TYPE zzeintfdatapar,
-          lt_intfparameters TYPE ztt_zintfmonitor012,
-          lo_abap_descr     TYPE REF TO cl_abap_typedescr,
-          ld_id             TYPE string,
-          ld_item_counter   TYPE zintfmonitor021-item.
-
-    FIELD-SYMBOLS: <ls_item>          LIKE LINE OF lt_item,
-                   <ls_intfparameter> LIKE LINE OF lt_intfparameters,
-                   <ls_data_row>      TYPE any,
-                   <lt_data_table>    TYPE ANY TABLE,
-                   <ls_data>          LIKE LINE OF mo_data_container->mt_data.
-
-*=======================================================================
-* Adds parameter 1 to table parameter 2.
-*=======================================================================
     DEFINE mac_add.
       ADD 1 TO ld_item_counter.
       INSERT INITIAL LINE INTO TABLE &2 ASSIGNING <ls_item>.
       <ls_item>-guid  = md_guid.
       <ls_item>-item  = ld_item_counter.
-      <ls_item>-param = <ls_intfparameter>-param.
+      <ls_item>-param = <ls_custo_intfparameter>-param.
 
-      cl_abap_container_utilities=>fill_container_c( EXPORTING  im_value               = &1
-                                                     IMPORTING  ex_container           = <ls_item>-dataval
-                                                     EXCEPTIONS illegal_parameter_type = 1 ).
+      cl_abap_container_utilities=>fill_container_c( EXPORTING  im_value     = &1
+                                                     IMPORTING  ex_container = <ls_item>-dataval
+                                                     EXCEPTIONS OTHERS       = 0 ).
     END-OF-DEFINITION.
 
-    TRY .
-*     Read Customized Interface Parameters
+
+
+    "Read Customized Interface Parameters
+    TRY.
         zcl_zintfmonitor012_read=>get_list( EXPORTING id_intfid = ms_detail-intfid
-                                            IMPORTING et_list   = lt_intfparameters ).
-      CATCH cx_db2_not_found.
-*   Do nothing
+                                            IMPORTING et_list   = DATA(lt_custo_intfparameters) ).
+      CATCH zcx_intfmonitor.
+        "Do nothing
     ENDTRY.
 
+    LOOP AT lt_custo_intfparameters ASSIGNING FIELD-SYMBOL(<ls_custo_intfparameter>).
+      ld_id           = <ls_custo_intfparameter>-param.
+      READ TABLE mo_data_container->mt_data WITH KEY id = ld_id ASSIGNING FIELD-SYMBOL(<ls_data>).
 
-*--------------------------------------------------------------------*
-* Map DataContainer to DB Structures
-*--------------------------------------------------------------------*
-    LOOP AT lt_intfparameters ASSIGNING <ls_intfparameter>.
-      ld_id           = <ls_intfparameter>-param.
-      READ TABLE mo_data_container->mt_data WITH KEY id = ld_id ASSIGNING <ls_data>.
-
-      lo_abap_descr = cl_abap_typedescr=>describe_by_data_ref( <ls_data>-data_ref ).
+      DATA(lo_abap_descr) = cl_abap_typedescr=>describe_by_data_ref( <ls_data>-data_ref ).
       IF lo_abap_descr->type_kind = cl_abap_typedescr=>typekind_table.
 
         ASSIGN <ls_data>-data_ref->* TO <lt_data_table>.
-        LOOP AT <lt_data_table> ASSIGNING <ls_data_row>.
-          mac_add <ls_data_row> lt_item[].
+        LOOP AT <lt_data_table> ASSIGNING FIELD-SYMBOL(<ls_data_row>).
+          mac_add <ls_data_row> ct_parameters[].
         ENDLOOP.
 
       ELSE.
 
         ASSIGN <ls_data>-data_ref->* TO <ls_data_row>.
-        mac_add <ls_data_row> lt_item[].
+        mac_add <ls_data_row> ct_parameters[].
 
       ENDIF.
     ENDLOOP.
-
-    TRY.
-*     Store execution data
-        ls_head-guid   = md_guid.
-        ls_head-detail = ms_detail.
-        zcl_zintfmonitor020_read=>save_detail( ls_head ).
-
-*     Store Interface data values
-        zcl_zintfmonitor021_read=>save_list( it_list = lt_item ).
-
-      CATCH cx_db2_not_found .
-*     Do nothing
-    ENDTRY.
-
   ENDMETHOD.
 ENDCLASS.

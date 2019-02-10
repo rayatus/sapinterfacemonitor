@@ -5,8 +5,6 @@ CLASS zcl_intfmonitor_data_container DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_INTFMONITOR_DATA_CONTAINER
-*"* do not include other source files here!!!
 
     TYPES:
       "! <p class="shorttext synchronized" lang="en">Data</p>
@@ -51,11 +49,9 @@ CLASS zcl_intfmonitor_data_container DEFINITION
         not_found
         error .
   PROTECTED SECTION.
-*"* protected components of class ZCL_INTFMONITOR_DATA_CONTAINER
-*"* do not include other source files here!!!
+
   PRIVATE SECTION.
-*"* private components of class ZCL_INTFMONITOR_DATA_CONTAINER
-*"* do not include other source files here!!!
+
 ENDCLASS.
 
 

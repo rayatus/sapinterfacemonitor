@@ -6,8 +6,7 @@ CLASS zcl_intfmonitor_gui_summary DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_INTFMONITOR_GUI_SUMMARY
-*"* do not include other source files here!!!
+
     TYPE-POOLS icon .
 
     "! <p class="shorttext synchronized" lang="en">inbound interfaces</p>
@@ -24,16 +23,14 @@ CLASS zcl_intfmonitor_gui_summary DEFINITION
       EXPORTING
         VALUE(it_intfmonitor) TYPE ztt_zintfmonitor030 .
   PROTECTED SECTION.
-*"* protected components of class ZCL_INTFMONITOR_GUI_SUMMARY
-*"* do not include other source files here!!!
+
 
     METHODS prepare_data
         REDEFINITION .
     METHODS _display
         REDEFINITION .
   PRIVATE SECTION.
-*"* private components of class ZCL_INTFMONITOR_GUI_SUMMARY
-*"* do not include other source files here!!!
+
 
     TYPES:
       BEGIN OF mtyp_s_tree_data,
@@ -110,25 +107,30 @@ CLASS zcl_intfmonitor_gui_summary IMPLEMENTATION.
 
       ls_tree_data-inbout  = id_inbout.
       ls_tree_data-xinbout = ld_text.
-      lo_node  = lo_nodes->add_node( related_node   = ld_node_key
-                                     relationship   = cl_gui_column_tree=>relat_last_child
-                                     folder         = abap_true
-                                     collapsed_icon = id_icon
-                                     expanded_icon  = id_icon
-                                     text           = ld_text
-                                     data_row       = ls_tree_data ).
-      lo_node->expand( ).
-      ld_node_key = lo_node->get_key( ).
+      TRY.
+          lo_node  = lo_nodes->add_node( related_node   = ld_node_key
+                                         relationship   = cl_gui_column_tree=>relat_last_child
+                                         folder         = abap_true
+                                         collapsed_icon = id_icon
+                                         expanded_icon  = id_icon
+                                         text           = ld_text
+                                         data_row       = ls_tree_data ).
 
-      LOOP AT mt_tree_data INTO ls_tree_data WHERE inbout = id_inbout.
-        ld_text = ls_tree_data-intfid.
-        lo_node = lo_nodes->add_node( related_node = ld_node_key
-                                      relationship = cl_gui_column_tree=>relat_last_child
-                                      text         = ld_text
-                                      data_row     = ls_tree_data ).
-        lo_item = lo_node->get_hierarchy_item( ).
-        lo_item->set_type( if_salv_c_item_type=>link ).
-      ENDLOOP.
+          lo_node->expand( ).
+          ld_node_key = lo_node->get_key( ).
+
+          LOOP AT mt_tree_data INTO ls_tree_data WHERE inbout = id_inbout.
+            ld_text = ls_tree_data-intfid.
+            lo_node = lo_nodes->add_node( related_node = ld_node_key
+                                          relationship = cl_gui_column_tree=>relat_last_child
+                                          text         = ld_text
+                                          data_row     = ls_tree_data ).
+            lo_item = lo_node->get_hierarchy_item( ).
+            lo_item->set_type( if_salv_c_item_type=>link ).
+          ENDLOOP.
+        CATCH cx_salv_msg.
+          "handle exception
+      ENDTRY.
     ENDIF.
   ENDMETHOD.
 

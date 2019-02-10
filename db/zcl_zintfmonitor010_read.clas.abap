@@ -1,23 +1,42 @@
+"! <p class="shorttext synchronized" lang="en">Interfaces</p>
 CLASS zcl_zintfmonitor010_read DEFINITION
   PUBLIC
-  CREATE PRIVATE .
+  CREATE PRIVATE INHERITING FROM zcl_zintfmonitor_base_read.
 
   PUBLIC SECTION.
 
+    "! <p class="shorttext synchronized" lang="en">Find details by keys</p>
+    "!
+    "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
+    "! @parameter rs_result | <p class="shorttext synchronized" lang="en">Details</p>
+    "! @raising zcx_intfmonitor | <p class="shorttext synchronized" lang="en">Unexpected error</p>
     CLASS-METHODS get_details
-      IMPORTING
-        !id_intfid       TYPE zintfmonitor010-intfid
-      RETURNING
-        VALUE(rs_result) TYPE zintfmonitor010
-      RAISING
-        zcx_intfmonitor .
+      IMPORTING id_intfid        TYPE zintfmonitor010-intfid
+      RETURNING VALUE(rs_result) TYPE zintfmonitor010
+      RAISING   zcx_intfmonitor .
+
+    "! <p class="shorttext synchronized" lang="en">Find details by keys returning also descriptions</p>
+    "!
+    "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
+    "! @parameter id_langu |  <p class="shorttext synchronized" lang="en">Language for descriptions</p>
+    "! @parameter rs_detail_x | <p class="shorttext synchronized" lang="en">Detail information with descriptions</p>
+    "! @raising zcx_intfmonitor | <p class="shorttext synchronized" lang="en">Unexpected error</p>
+    CLASS-METHODS get_detail_x
+      IMPORTING id_intfid          TYPE zintfmonitor010-intfid
+                id_langu           TYPE sy-langu DEFAULT sy-langu
+      RETURNING VALUE(rs_detail_x) TYPE zeintfmonitor010_detail_x
+      RAISING   zcx_intfmonitor .
+
+    "! <p class="shorttext synchronized" lang="en">Find Multiple details by keys</p>
+    "!
+    "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
+    "! @parameter et_list   | <p class="shorttext synchronized" lang="en">List Details</p>
+    "! @raising zcx_intfmonitor | <p class="shorttext synchronized" lang="en">Unexpected error</p>
     CLASS-METHODS get_list
-      IMPORTING
-        !id_intfid TYPE zintfmonitor010-intfid OPTIONAL
-      EXPORTING
-        !et_list   TYPE ztt_zintfmonitor010
-      RAISING
-        zcx_intfmonitor .
+      IMPORTING id_intfid TYPE zintfmonitor010-intfid OPTIONAL
+      EXPORTING et_list   TYPE ztt_zintfmonitor010
+      RAISING   zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Initializes Buffer Data</p>
     CLASS-METHODS init_buffer .
 
   PROTECTED SECTION.
@@ -28,14 +47,12 @@ CLASS zcl_zintfmonitor010_read DEFINITION
         intfid TYPE RANGE OF zintfmonitor010-intfid,
       END   OF mtyp_ranges .
 
+    "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
     CLASS-DATA ms_ranges TYPE mtyp_ranges .
+    "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
     CLASS-DATA mt_buffer TYPE ztt_zintfmonitor010 .
 
-    CLASS-METHODS _add_range
-      IMPORTING
-        !id_low   TYPE any
-      CHANGING
-        !ct_range TYPE ANY TABLE .
+
 ENDCLASS.
 
 
@@ -85,7 +102,7 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
     DELETE ADJACENT DUPLICATES FROM mt_buffer.
 
     IF et_list IS INITIAL.
-      RAISE EXCEPTION TYPE cx_os_db.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
     ENDIF.
   ENDMETHOD.
 
@@ -95,22 +112,24 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD _add_range.
+  METHOD get_detail_x.
+    TRY.
+        DATA(ls_detail) = get_details( id_intfid = id_intfid ).
 
-    FIELD-SYMBOLS: <ls_row>    TYPE any,
-                   <ld_sign>   TYPE any,
-                   <ld_option> TYPE any,
-                   <ld_low>    TYPE any.
+        MOVE-CORRESPONDING ls_detail TO rs_detail_x.
 
-    INSERT INITIAL LINE INTO TABLE ct_range ASSIGNING <ls_row>.
+        SELECT SINGLE descript  INTO rs_detail_x-xclsname FROM seoclasstx WHERE clsname = rs_detail_x-clsname AND langu = id_langu.
+        IF sy-subrc IS NOT INITIAL.
+          rs_detail_x-xclsname = |< { rs_detail_x-xclsname } >|.
+        ENDIF.
 
-    ASSIGN COMPONENT 'LOW' OF STRUCTURE <ls_row> TO <ld_low>.
-    <ld_low> = id_low.
+        rs_detail_x-xinbout = zcl_intfmonitor_util=>get_domain_text( id_domname = 'ZZDINTFINOUT' id_value = rs_detail_x-inbout ).
+        rs_detail_x-xintfid = zcl_intfmonitor_util=>get_domain_text( id_domname = 'ZZDINTFID'    id_value = rs_detail_x-intfid ).
 
-    ASSIGN COMPONENT 'SIGN' OF STRUCTURE <ls_row> TO <ld_sign>.
-    <ld_sign> = 'I'.
+      CATCH zcx_intfmonitor INTO DATA(lo_exception).
+        RAISE EXCEPTION lo_exception.
+    ENDTRY.
 
-    ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>.
-    <ld_option> = 'EQ'.
   ENDMETHOD.
+
 ENDCLASS.

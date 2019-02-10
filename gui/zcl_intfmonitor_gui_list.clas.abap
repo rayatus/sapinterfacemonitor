@@ -6,8 +6,7 @@ CLASS zcl_intfmonitor_gui_list DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_INTFMONITOR_GUI_LIST
-*"* do not include other source files here!!!
+
 
     "! <p class="shorttext synchronized" lang="en">Interface execution has been selected</p>
     "!
@@ -22,8 +21,7 @@ CLASS zcl_intfmonitor_gui_list DEFINITION
       IMPORTING
           !it_intfmonitor .
   PROTECTED SECTION.
-*"* protected components of class ZCL_INTFMONITOR_GUI_LIST
-*"* do not include other source files here!!!
+
 
     "! <p class="shorttext synchronized" lang="en">Sets Grid data to be displayed</p>
     "!
@@ -37,8 +35,7 @@ CLASS zcl_intfmonitor_gui_list DEFINITION
     METHODS _display
         REDEFINITION .
   PRIVATE SECTION.
-*"* private components of class ZCL_INTFMONITOR_GUI_LIST
-*"* do not include other source files here!!!
+
 
     TYPES:
       BEGIN OF mtyp_s_alv_data,
@@ -104,10 +101,14 @@ CLASS zcl_intfmonitor_gui_list IMPLEMENTATION.
 
   METHOD on_summary_interface_selected.
 
-    mt_list = it_intfmonitor..
+    mt_list = it_intfmonitor.
 
     set_grid_data( ).
-    mo_grid->set_data( CHANGING t_table = mt_grid_data ).
+    TRY.
+        mo_grid->set_data( CHANGING t_table = mt_grid_data ).
+      CATCH cx_salv_no_new_data_allowed.
+        "do nothing
+    ENDTRY.
     mo_grid->refresh( ).
   ENDMETHOD.
 
@@ -186,7 +187,11 @@ CLASS zcl_intfmonitor_gui_list IMPLEMENTATION.
 *     Prepare columns
         lo_columns = mo_grid->get_columns( ).
         lo_columns->set_optimize( ).
-        lo_columns->set_count_column( 'ROWS' ).             "#EC NOTEXT
+        TRY.
+            lo_columns->set_count_column( 'ROWS' ).         "#EC NOTEXT
+          CATCH cx_salv_data_error.
+            "Do nothing
+        ENDTRY.
         lt_cols = lo_columns->get( ).
 
         LOOP AT lt_cols INTO ls_col.

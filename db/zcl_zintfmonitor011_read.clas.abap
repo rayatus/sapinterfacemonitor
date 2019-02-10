@@ -1,19 +1,31 @@
+"! <p class="shorttext synchronized" lang="en">Interface description</p>
 CLASS zcl_zintfmonitor011_read DEFINITION
   PUBLIC
-  CREATE PRIVATE .
+  CREATE PRIVATE INHERITING FROM zcl_zintfmonitor_base_read..
 
   PUBLIC SECTION.
 
+    "! <p class="shorttext synchronized" lang="en">Delete Details</p>
+    "!
+    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS delete_details
       IMPORTING
         !is_details TYPE zintfmonitor011
       RAISING
         zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Delete Multiple</p>
+    "!
+    "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS delete_list
       IMPORTING
         !it_list TYPE ztt_zintfmonitor011
       RAISING
         zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Find details by keys</p>
+    "!
+    "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
+    "! @parameter id_spras  | <p class="shorttext synchronized" lang="en">Language</p>
+    "! @parameter rs_result | <p class="shorttext synchronized" lang="en">Details</p>
     CLASS-METHODS get_details
       IMPORTING
         !id_intfid       TYPE zintfmonitor011-intfid
@@ -22,6 +34,11 @@ CLASS zcl_zintfmonitor011_read DEFINITION
         VALUE(rs_result) TYPE zintfmonitor011
       RAISING
         zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Find Multiple details by keys</p>
+    "!
+    "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
+    "! @parameter id_spras  | <p class="shorttext synchronized" lang="en">Language</p>
+    "! @parameter et_list   | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS get_list
       IMPORTING
         !id_intfid TYPE zintfmonitor011-intfid OPTIONAL
@@ -30,12 +47,19 @@ CLASS zcl_zintfmonitor011_read DEFINITION
         !et_list   TYPE ztt_zintfmonitor011
       RAISING
         zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Initializes Buffer Data</p>
     CLASS-METHODS init_buffer .
+    "! <p class="shorttext synchronized" lang="en">Save Details</p>
+    "!
+    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS save_details
       IMPORTING
         !is_details TYPE zintfmonitor011
       RAISING
         zcx_intfmonitor .
+    "! <p class="shorttext synchronized" lang="en">Save Multiple</p>
+    "!
+    "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
     CLASS-METHODS save_list
       IMPORTING
         !it_list TYPE ztt_zintfmonitor011
@@ -50,14 +74,11 @@ CLASS zcl_zintfmonitor011_read DEFINITION
         spras  TYPE RANGE OF zintfmonitor011-spras,
       END   OF mtyp_ranges .
 
+    "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
     CLASS-DATA ms_ranges TYPE mtyp_ranges .
+    "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
     CLASS-DATA mt_buffer TYPE ztt_zintfmonitor011 .
 
-    CLASS-METHODS _add_range
-      IMPORTING
-        !id_low   TYPE any
-      CHANGING
-        !ct_range TYPE ANY TABLE .
 ENDCLASS.
 
 
@@ -96,7 +117,6 @@ CLASS zcl_zintfmonitor011_read IMPLEMENTATION.
 
     DATA lt_list      TYPE ztt_zintfmonitor011 .
     DATA ls_list      LIKE LINE OF lt_list.
-    DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
     READ TABLE mt_buffer INTO rs_result
       WITH KEY intfid = id_intfid
@@ -112,7 +132,7 @@ CLASS zcl_zintfmonitor011_read IMPLEMENTATION.
           READ TABLE lt_list INDEX 1 INTO ls_list.
           MOVE-CORRESPONDING ls_list TO rs_result.
 
-        CATCH zcx_intfmonitor INTO lo_exception.
+        CATCH zcx_intfmonitor INTO data(lo_exception).
           RAISE EXCEPTION lo_exception.
       ENDTRY.
 
@@ -157,14 +177,13 @@ CLASS zcl_zintfmonitor011_read IMPLEMENTATION.
   METHOD save_details.
     DATA lt_list TYPE ztt_zintfmonitor011 .
     DATA ls_list LIKE LINE OF lt_list.
-    DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
     CHECK is_details IS NOT INITIAL.
     TRY .
         MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
         save_list( lt_list[] ).
-      CATCH zcx_intfmonitor INTO lo_exception.
+      CATCH zcx_intfmonitor INTO data(lo_exception).
         RAISE EXCEPTION lo_exception.
     ENDTRY.
   ENDMETHOD.
@@ -181,22 +200,4 @@ CLASS zcl_zintfmonitor011_read IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD _add_range.
-
-    FIELD-SYMBOLS: <ls_row>    TYPE any,
-                   <ld_sign>   TYPE any,
-                   <ld_option> TYPE any,
-                   <ld_low>    TYPE any.
-
-    INSERT INITIAL LINE INTO TABLE ct_range ASSIGNING <ls_row>.
-
-    ASSIGN COMPONENT 'LOW' OF STRUCTURE <ls_row> TO <ld_low>.
-    <ld_low> = id_low.
-
-    ASSIGN COMPONENT 'SIGN' OF STRUCTURE <ls_row> TO <ld_sign>.
-    <ld_sign> = 'I'.
-
-    ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>.
-    <ld_option> = 'EQ'.
-  ENDMETHOD.
 ENDCLASS.

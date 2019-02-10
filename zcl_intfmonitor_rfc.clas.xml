@@ -7,7 +7,6 @@
     <VERSION>1</VERSION>
     <LANGU>E</LANGU>
     <DESCRIPT>SAP Interface Monitor - RFC</DESCRIPT>
-    <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
@@ -37,6 +36,18 @@
      <CMPNAME>MTYP_T_INTFPARAMETERS</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Interface Parameters</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_RFC</CLSNAME>
+     <CMPNAME>_MAP_DATACONTAINER_TO_PARAMS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maps data container execution parameters to parameter list</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_INTFMONITOR_RFC</CLSNAME>
+     <CMPNAME>_MAP_PARAMS_TO_DATACONTAINER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maps execution parameter list values to data container</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>
