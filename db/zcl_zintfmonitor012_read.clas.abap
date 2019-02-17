@@ -5,6 +5,14 @@ CLASS zcl_zintfmonitor012_read DEFINITION
 
   PUBLIC SECTION.
 
+    CONSTANTS:
+      "! <p class="shorttext synchronized" lang="en">Parameter data types</p>
+      BEGIN OF mc_datatype,
+        processing TYPE zintfmonitor012-datatype VALUE 'P',
+        returning  TYPE zintfmonitor012-datatype VALUE 'R',
+        undefined  TYPE zintfmonitor012-datatype VALUE '?',
+      END   OF mc_datatype.
+
     "! <p class="shorttext synchronized" lang="en">Class constructor</p>
     CLASS-METHODS class_constructor.
     "! <p class="shorttext synchronized" lang="en">Delete Details</p>
@@ -53,18 +61,24 @@ CLASS zcl_zintfmonitor012_read DEFINITION
     CLASS-METHODS init_buffer .
     "! <p class="shorttext synchronized" lang="en">Save Details</p>
     "!
-    "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>
+    "! @parameter is_details | <p class="shorttext synchronized" lang="en">Detail</p>
+    "! @parameter if_add_to_buffer | <p class="shorttext synchronized" lang="en">Add to buffer?</p>
+    "! @raising zcx_intfmonitor | Undefined error
     CLASS-METHODS save_details
       IMPORTING
-        is_details TYPE zintfmonitor012
+        is_details       TYPE zintfmonitor012
+        if_add_to_buffer TYPE abap_bool DEFAULT abap_false
       RAISING
         zcx_intfmonitor .
     "! <p class="shorttext synchronized" lang="en">Save Multiple</p>
     "!
     "! @parameter it_list | <p class="shorttext synchronized" lang="en">List Details</p>
+    "! @parameter if_add_to_buffer | <p class="shorttext synchronized" lang="en">Add to buffer?</p>
+    "! @raising zcx_intfmonitor | Undefined error
     CLASS-METHODS save_list
       IMPORTING
-        it_list TYPE ztt_zintfmonitor012
+        it_list          TYPE ztt_zintfmonitor012
+        if_add_to_buffer TYPE abap_bool DEFAULT abap_false
       RAISING
         zcx_intfmonitor .
   PROTECTED SECTION.
@@ -186,7 +200,8 @@ CLASS zcl_zintfmonitor012_read IMPLEMENTATION.
     TRY .
         MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
-        save_list( lt_list[] ).
+        save_list( EXPORTING it_list          = lt_list[]
+                             if_add_to_buffer = if_add_to_buffer ).
       CATCH zcx_intfmonitor INTO lo_exception.
         RAISE EXCEPTION lo_exception.
     ENDTRY.
@@ -201,6 +216,22 @@ CLASS zcl_zintfmonitor012_read IMPLEMENTATION.
     IF NOT sy-subrc IS INITIAL.
       RAISE EXCEPTION TYPE zcx_intfmonitor.
     ENDIF.
+
+    IF if_add_to_buffer = abap_true.
+      LOOP AT it_list INTO DATA(ls_list).
+        READ TABLE gt_buffer WITH KEY intfid = ls_list-intfid
+                                      param  = ls_list-param
+                                      ASSIGNING FIELD-SYMBOL(<ls_buffer>).
+        IF sy-subrc IS INITIAL.
+          <ls_buffer>-datatype  = ls_list-datatype.
+          <ls_buffer>-paramtype = ls_list-paramtype.
+        ELSE.
+          INSERT ls_list INTO TABLE gt_buffer.
+        ENDIF.
+      ENDLOOP.
+
+    ENDIF.
+
   ENDMETHOD.
 
 

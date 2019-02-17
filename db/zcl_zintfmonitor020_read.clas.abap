@@ -15,6 +15,15 @@ CLASS zcl_zintfmonitor020_read DEFINITION
         lognumber   TYPE RANGE OF balognr,
       END OF mtyp_all_fields.
 
+    CONSTANTS:
+      "! <p class="shorttext synchronized" lang="en">Ended with ok/ko/warnings</p>
+      BEGIN OF mc_procendtype,
+        success   TYPE zzeprocendtype VALUE '1',
+        warning   TYPE zzeprocendtype VALUE '2',
+        error     TYPE zzeprocendtype VALUE '3',
+        undefined TYPE zzeprocendtype VALUE '0',
+      END OF mc_procendtype.
+
     "! <p class="shorttext synchronized" lang="en">Delete Details</p>
     "!
     "! @parameter is_details | <p class="shorttext synchronized" lang="en">List Details</p>

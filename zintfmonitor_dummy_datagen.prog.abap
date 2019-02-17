@@ -69,15 +69,15 @@ FORM prepare_custo.
   ls_zintfmonitor012-datatype   = 'R'.
   INSERT ls_zintfmonitor012 INTO TABLE lt_zintfmonitor012.
 
-  MODIFY zintfmonitor012 FROM TABLE lt_zintfmonitor012.
+*  MODIFY zintfmonitor012 FROM TABLE lt_zintfmonitor012.
 
 ENDFORM.
 
 FORM insert_dummy_data.
 
-  DATA: begin of ls_dummy,
-          dummy type c LENGTH 200,
-        end   of ls_dummy.
+  DATA: BEGIN OF ls_dummy,
+          dummy TYPE string,
+        END   OF ls_dummy.
 
   SELECT * FROM zintfmonitor020 INTO TABLE @DATA(lt_intfmonitor020) WHERE intfid = 'DUMMY01' OR intfid = 'DUMMY02'.
   DELETE FROM zintfmonitor020 WHERE intfid = 'DUMMY01' OR intfid = 'DUMMY02'.

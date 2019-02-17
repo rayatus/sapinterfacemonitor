@@ -89,6 +89,7 @@ CLASS zcf_intfmonitor IMPLEMENTATION.
         ls_detail-procdate     = sy-datum.
         ls_detail-proctime     = sy-uzeit.
         ls_detail-procby       = sy-uname.
+        ls_detail-procendtype  = zcl_zintfmonitor020_read=>mc_procendtype-undefined.
 
         ro_instance->initialize( id_guid   = ld_guid
                                  is_detail = ls_detail ).

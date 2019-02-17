@@ -34,12 +34,6 @@ CLASS zcl_intfmonitor_gui_detail DEFINITION
     DATA mo_previous_interface TYPE REF TO zif_intfmonitor .
     "! <p class="shorttext synchronized" lang="en">Dynamic Document for displaying title</p>
     DATA mo_dd_document TYPE REF TO cl_dd_document .
-    "! <p class="shorttext synchronized" lang="en">Main container default size</p>
-    "! <p class="shorttext synchronized" lang="en">Processing parameter</p>
-    CONSTANTS mc_processing TYPE zzeintfdatatype VALUE 'P'. "#EC NOTEXT
-    "! <p class="shorttext synchronized" lang="en">Returning parameter</p>
-    CONSTANTS mc_returning TYPE zzeintfdatatype VALUE 'R'.  "#EC NOTEXT
-    "! <p class="shorttext synchronized" lang="en">Main container current size</p>
     "! <p class="shorttext synchronized" lang="en">Grid Container</p>
     DATA mo_container_grid TYPE REF TO cl_gui_container .
     "! <p class="shorttext synchronized" lang="en">Container for title</p>
@@ -259,7 +253,7 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
 
     mo_dd_document->initialize_document( EXPORTING first_time = lf_first_time ).
 
-* Prepare text to be displayed
+    " Prepare text to be displayed
     READ TABLE mt_list INDEX 1 INTO lo_intfmonitor.
     ls_detail_x = lo_intfmonitor->get_detail_x( ).
 
@@ -290,8 +284,8 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
           lf_new      TYPE         xfeld.
 
     IF mo_tree IS BOUND.
-*   It's not necessary to build once again Tree, just delete its content
-*   and insert new data
+     " It's not necessary to build once again Tree, just delete its content
+     " and insert new data
       lo_nodes = mo_tree->get_nodes( ).
       TRY.
           lo_nodes->delete_all( ).
@@ -299,7 +293,7 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
           "Do nothing
       ENDTRY.
     ELSE.
-*   It's necessary to create new tree
+      " It's necessary to create new tree
       TRY.
           lf_new = abap_true.
           cl_salv_tree=>factory( EXPORTING r_container = mo_container_tree
@@ -349,9 +343,10 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
       ENDTRY.
     ENDIF.
 
-* Insert current data into Tree
-    build_tree_section( mc_processing ).
-    build_tree_section( mc_returning ).
+    "Insert current data into Tree
+    build_tree_section( zcl_zintfmonitor012_read=>mc_datatype-processing ).
+    build_tree_section( zcl_zintfmonitor012_read=>mc_datatype-returning ).
+    build_tree_section( zcl_zintfmonitor012_read=>mc_datatype-undefined ).
 
     mo_tree->display( ).
 
@@ -422,10 +417,10 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
     build_tree( ).
     build_title( ).
 
-* Simulate one param has been chosen in order to build Grid with param data
-    READ TABLE mt_tree_data WITH KEY datatype = mc_processing INTO ls_tree_data.
+    " Simulate one param has been chosen in order to build Grid with param data
+    READ TABLE mt_tree_data WITH KEY datatype = zcl_zintfmonitor012_read=>mc_datatype-processing INTO ls_tree_data.
     IF NOT sy-subrc IS INITIAL.
-      READ TABLE mt_tree_data WITH KEY datatype = mc_returning INTO ls_tree_data.
+      READ TABLE mt_tree_data WITH KEY datatype = zcl_zintfmonitor012_read=>mc_datatype-returning INTO ls_tree_data.
       IF NOT sy-subrc IS INITIAL.
         READ TABLE mt_tree_data INDEX 1 INTO ls_tree_data.
       ENDIF.

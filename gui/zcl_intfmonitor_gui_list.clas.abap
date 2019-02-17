@@ -227,20 +227,40 @@ CLASS zcl_intfmonitor_gui_list IMPLEMENTATION.
 
       DATA(lo_columns) = mo_grid->get_columns( ).
       lo_columns->set_optimize( ).
-      TRY.
-          lo_columns->set_count_column( 'ROWS' ).           "#EC NOTEXT
-        CATCH cx_salv_data_error.
-          "Do nothing
-      ENDTRY.
-      DATA(lt_cols) = lo_columns->get( ).
 
+      DATA(lt_cols) = lo_columns->get( ).
       LOOP AT lt_cols INTO DATA(ls_col).
         CASE ls_col-columnname.
+          WHEN 'PROCDATE'.                                  "#EC NOTEXT
+            CAST cl_salv_column_list( ls_col-r_column )->set_cell_type( if_salv_c_cell_type=>hotspot ).
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 1 ).
+          WHEN 'PROCTIME'.                                  "#EC NOTEXT
+            CAST cl_salv_column_list( ls_col-r_column )->set_cell_type( if_salv_c_cell_type=>hotspot ).
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 2 ).
+          WHEN 'INTFID'.                                    "#EC NOTEXT
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 3 ).
+          WHEN 'XINTFID'.                                   "#EC NOTEXT
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 4 ).
+          WHEN 'PROCBY'.                                    "#EC NOTEXT
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 5 ).
+          WHEN 'XPROCBY'.                                   "#EC NOTEXT
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 6 ).
+          WHEN 'PROCENDTYPE'.                               "#EC NOTEXT
+            ls_col-r_column->set_visible(  if_salv_c_bool_sap=>false ).
+          WHEN 'XPROCENDTYPE'.                              "#EC NOTEXT
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 7 ).
+          WHEN 'LOGNUMBER'.                                 "#EC NOTEXT
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 8 ).
+          WHEN 'ROWS'.                                      "#EC NOTEXT
+            TRY.
+                lo_columns->set_count_column( ls_col-columnname ).
+              CATCH cx_salv_data_error.
+                "Do nothing
+            ENDTRY.
+            lo_columns->set_column_position( columnname = ls_col-columnname position   = 9 ).
           WHEN 'GUID'.                                      "#EC NOTEXT
             ls_col-r_column->set_visible( if_salv_c_bool_sap=>false ).
-          WHEN 'PROCDATE'                                   "#EC NOTEXT
-            OR 'PROCTIME'.                                  "#EC NOTEXT
-            CAST cl_salv_column_list( ls_col-r_column )->set_cell_type( if_salv_c_cell_type=>hotspot ).
+
         ENDCASE.
       ENDLOOP.
 
