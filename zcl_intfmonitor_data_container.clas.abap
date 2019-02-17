@@ -108,19 +108,19 @@ CLASS zcl_intfmonitor_data_container IMPLEMENTATION.
       TRY.
           IF <ls_data>-obj_ref IS NOT INITIAL.
 *       objref
-            IF ed_data IS REQUESTED.
+            IF ed_data IS SUPPLIED.
               ed_data ?= <ls_data>-obj_ref.
             ENDIF.
-            IF er_data IS REQUESTED.
+            IF er_data IS SUPPLIED.
               GET REFERENCE OF <ls_data>-obj_ref INTO er_data.
             ENDIF.
           ELSE.
 *       data
             ASSIGN <ls_data>-data_ref->* TO <ld_data>.
-            IF er_data IS REQUESTED.
+            IF er_data IS SUPPLIED.
               er_data = <ls_data>-data_ref.
             ENDIF.
-            IF ed_data IS REQUESTED.
+            IF ed_data IS SUPPLIED.
               ed_data = <ld_data>.
             ENDIF.
           ENDIF.
@@ -128,7 +128,7 @@ CLASS zcl_intfmonitor_data_container IMPLEMENTATION.
 *     Error?
           RAISE error.
       ENDTRY.
-      IF ed_type IS REQUESTED.
+      IF ed_type IS SUPPLIED.
         ed_type = <ls_data>-type.
       ENDIF.
     ENDIF.

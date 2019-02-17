@@ -55,8 +55,8 @@ CLASS zcf_intfmonitor IMPLEMENTATION.
 
         CREATE OBJECT ro_instance TYPE (ls_custo-clsname).
 
-        ro_instance->initialize( EXPORTING id_guid   = ls_head-guid
-                                           is_detail = ls_head-detail ).
+        ro_instance->initialize( id_guid   = ls_head-guid
+                                 is_detail = ls_head-detail ).
 *     Retrieve saved data
         ro_instance->read( ).
 
@@ -90,8 +90,8 @@ CLASS zcf_intfmonitor IMPLEMENTATION.
         ls_detail-proctime     = sy-uzeit.
         ls_detail-procby       = sy-uname.
 
-        ro_instance->initialize( EXPORTING id_guid   = ld_guid
-                                           is_detail = ls_detail ).
+        ro_instance->initialize( id_guid   = ld_guid
+                                 is_detail = ls_detail ).
 
       CATCH ZCX_INTFMONITOR .
         MESSAGE e001(zintfmonitor) WITH id_intfid RAISING not_found.

@@ -1,7 +1,7 @@
 "! <p class="shorttext synchronized" lang="en">Interface Parameters descriptions</p>
 CLASS zcl_zintfmonitor013_read DEFINITION
   PUBLIC
-  CREATE PRIVATE INHERITING FROM zcl_zintfmonitor_base_read..
+  CREATE PRIVATE INHERITING FROM zcl_zintfmonitor_base_read.
 
   PUBLIC SECTION.
 
@@ -80,9 +80,9 @@ CLASS zcl_zintfmonitor013_read DEFINITION
       END   OF mtyp_ranges .
 
     "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
-    CLASS-DATA ms_ranges TYPE mtyp_ranges .
+    CLASS-DATA gs_ranges TYPE mtyp_ranges .
     "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
-    CLASS-DATA mt_buffer TYPE ztt_zintfmonitor013 .
+    CLASS-DATA gt_buffer TYPE ztt_zintfmonitor013 .
 
 ENDCLASS.
 
@@ -96,7 +96,7 @@ CLASS zcl_zintfmonitor013_read IMPLEMENTATION.
     DATA ls_list      LIKE LINE OF lt_list.
     DATA lo_exception TYPE REF TO  zcx_intfmonitor.
 
-    CHECK is_details IS NOT INITIAL.
+    ASSERT is_details IS NOT INITIAL.
     TRY .
         MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
@@ -109,7 +109,7 @@ CLASS zcl_zintfmonitor013_read IMPLEMENTATION.
 
   METHOD delete_list.
 
-    CHECK it_list[] IS NOT INITIAL.
+    ASSERT it_list[] IS NOT INITIAL.
     DELETE zintfmonitor013  FROM TABLE it_list.
 
     IF NOT sy-subrc IS INITIAL.
@@ -124,17 +124,17 @@ CLASS zcl_zintfmonitor013_read IMPLEMENTATION.
     DATA ls_list      LIKE LINE OF lt_list.
     DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
-    READ TABLE mt_buffer INTO rs_result
+    READ TABLE gt_buffer INTO rs_result
       WITH KEY intfid = id_intfid
-  						 spras = id_spras
-  						 param = id_param.
+               spras = id_spras
+               param = id_param.
 
     IF NOT sy-subrc IS INITIAL.
 
       TRY.
           get_list( EXPORTING  id_intfid = id_intfid
-  														 id_spras = id_spras
-  														 id_param = id_param
+                               id_spras = id_spras
+                               id_param = id_param
                     IMPORTING  et_list = lt_list ).
 
           READ TABLE lt_list INDEX 1 INTO ls_list.
@@ -150,32 +150,32 @@ CLASS zcl_zintfmonitor013_read IMPLEMENTATION.
 
   METHOD get_list.
 
-    CLEAR ms_ranges.
+    CLEAR gs_ranges.
 
     IF id_intfid IS SUPPLIED.
       _add_range( EXPORTING id_low   = id_intfid
-                  CHANGING  ct_range = ms_ranges-intfid ).
+                  CHANGING  ct_range = gs_ranges-intfid ).
     ENDIF.
 
     IF id_spras IS SUPPLIED.
       _add_range( EXPORTING id_low   = id_spras
-                  CHANGING  ct_range = ms_ranges-spras ).
+                  CHANGING  ct_range = gs_ranges-spras ).
     ENDIF.
 
     IF id_param IS SUPPLIED.
       _add_range( EXPORTING id_low   = id_param
-                  CHANGING  ct_range = ms_ranges-param ).
+                  CHANGING  ct_range = gs_ranges-param ).
     ENDIF.
 
     SELECT * INTO TABLE et_list
       FROM zintfmonitor013
-      WHERE intfid IN ms_ranges-intfid
-        AND spras IN ms_ranges-spras
-        AND param IN ms_ranges-param.
+      WHERE intfid IN gs_ranges-intfid
+        AND spras IN gs_ranges-spras
+        AND param IN gs_ranges-param.
 
-    INSERT LINES OF et_list INTO TABLE mt_buffer.
-    SORT mt_buffer.
-    DELETE ADJACENT DUPLICATES FROM mt_buffer.
+    INSERT LINES OF et_list INTO TABLE gt_buffer.
+    SORT gt_buffer.
+    DELETE ADJACENT DUPLICATES FROM gt_buffer.
 
     IF et_list IS INITIAL.
       RAISE EXCEPTION TYPE zcx_intfmonitor.
@@ -184,7 +184,7 @@ CLASS zcl_zintfmonitor013_read IMPLEMENTATION.
 
 
   METHOD init_buffer.
-    CLEAR mt_buffer[].
+    CLEAR gt_buffer[].
   ENDMETHOD.
 
 
@@ -193,7 +193,7 @@ CLASS zcl_zintfmonitor013_read IMPLEMENTATION.
     DATA ls_list LIKE LINE OF lt_list.
     DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
-    CHECK is_details IS NOT INITIAL.
+    ASSERT is_details IS NOT INITIAL.
     TRY .
         MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
@@ -206,7 +206,7 @@ CLASS zcl_zintfmonitor013_read IMPLEMENTATION.
 
   METHOD save_list.
 
-    CHECK it_list[] IS NOT INITIAL.
+    ASSERT it_list[] IS NOT INITIAL.
     MODIFY zintfmonitor013  FROM TABLE it_list.
 
     IF NOT sy-subrc IS INITIAL.

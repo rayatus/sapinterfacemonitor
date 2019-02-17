@@ -3,32 +3,32 @@ CLASS zcl_intfmonitor_rfc DEFINITION
   PUBLIC
   CREATE PUBLIC
 
-  GLOBAL FRIENDS zcf_intfmonitor .
+  GLOBAL FRIENDS zcf_intfmonitor.
 
   PUBLIC SECTION.
 
 
-    INTERFACES zif_intfmonitor .
+    INTERFACES zif_intfmonitor.
 
     ALIASES md_guid
-      FOR zif_intfmonitor~md_guid .
+      FOR zif_intfmonitor~md_guid.
     ALIASES ms_detail
-      FOR zif_intfmonitor~ms_detail .
+      FOR zif_intfmonitor~ms_detail.
     ALIASES add_parameter
-      FOR zif_intfmonitor~add_parameter .
+      FOR zif_intfmonitor~add_parameter.
     ALIASES get_detail
-      FOR zif_intfmonitor~get_detail .
+      FOR zif_intfmonitor~get_detail.
     ALIASES get_detail_x
-      FOR zif_intfmonitor~get_detail_x .
+      FOR zif_intfmonitor~get_detail_x.
     ALIASES get_parameter
-      FOR zif_intfmonitor~get_parameter .
+      FOR zif_intfmonitor~get_parameter.
     ALIASES read
-      FOR zif_intfmonitor~read .
+      FOR zif_intfmonitor~read.
     ALIASES store
-      FOR zif_intfmonitor~store .
+      FOR zif_intfmonitor~store.
 
     "! <p class="shorttext synchronized" lang="en">CONSTRUCTOR</p>
-    METHODS constructor .
+    METHODS constructor.
   PROTECTED SECTION.
 
 
@@ -103,7 +103,7 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
         ls_intf_x = zcl_zintfmonitor010_read=>get_detail_x( rs_detail_x-detail-intfid  ).
         rs_detail_x-xintfid = ls_intf_x-xintfid.
       CATCH zcx_intfmonitor  .
-      rs_detail_x-xintfid = |< { rs_detail_x-intfid } >|.
+        rs_detail_x-xintfid = |< { rs_detail_x-intfid } >|.
     ENDTRY.
 
 
@@ -128,13 +128,13 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
 
     ld_string = id_param.
 
-    IF er_data IS REQUESTED AND sy-subrc IS INITIAL.
+    IF er_data IS SUPPLIED AND sy-subrc IS INITIAL.
       mo_data_container->get( EXPORTING id_id   = ld_string
                               IMPORTING er_data = er_data
                               EXCEPTIONS OTHERS = 999 ).
     ENDIF.
 
-    IF ex_val IS REQUESTED AND sy-subrc IS INITIAL.
+    IF ex_val IS SUPPLIED AND sy-subrc IS INITIAL.
       mo_data_container->get( EXPORTING id_id   = ld_string
                               IMPORTING ed_data = ex_val
                               EXCEPTIONS OTHERS = 999 ).
@@ -168,7 +168,7 @@ CLASS zcl_intfmonitor_rfc IMPLEMENTATION.
     TRY.
         zcl_zintfmonitor021_read=>get_list( EXPORTING id_guid = md_guid
                                             IMPORTING et_list = DATA(lt_item) ).
-        _map_params_to_datacontainer( EXPORTING it_parameters = lt_item ).
+        _map_params_to_datacontainer( it_parameters = lt_item ).
       CATCH  zcx_intfmonitor.
         "No parameters -> Do nothing
     ENDTRY.

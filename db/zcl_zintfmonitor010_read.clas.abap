@@ -5,6 +5,9 @@ CLASS zcl_zintfmonitor010_read DEFINITION
 
   PUBLIC SECTION.
 
+    "! <p class="shorttext synchronized" lang="en">Class constructor</p>
+    CLASS-METHODS class_constructor.
+
     "! <p class="shorttext synchronized" lang="en">Find details by keys</p>
     "!
     "! @parameter id_intfid | <p class="shorttext synchronized" lang="en">Interface</p>
@@ -48,9 +51,11 @@ CLASS zcl_zintfmonitor010_read DEFINITION
       END   OF mtyp_ranges .
 
     "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
-    CLASS-DATA ms_ranges TYPE mtyp_ranges .
+    CLASS-DATA gs_ranges TYPE mtyp_ranges .
     "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
-    CLASS-DATA mt_buffer TYPE ztt_zintfmonitor010 .
+    CLASS-DATA gt_buffer TYPE ztt_zintfmonitor010 .
+    "! <p class="shorttext synchronized" lang="en">Reads DB Table</p>
+    CLASS-METHODS do_select.
 
 
 ENDCLASS.
@@ -65,7 +70,7 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
     DATA ls_list      LIKE LINE OF lt_list.
     DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
-    READ TABLE mt_buffer INTO rs_result
+    READ TABLE gt_buffer INTO rs_result
       WITH KEY intfid = id_intfid.
 
     IF NOT sy-subrc IS INITIAL.
@@ -86,20 +91,17 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
 
   METHOD get_list.
 
-    CLEAR ms_ranges.
+    CLEAR gs_ranges.
 
     IF id_intfid IS SUPPLIED.
       _add_range( EXPORTING id_low   = id_intfid
-                  CHANGING  ct_range = ms_ranges-intfid ).
+                  CHANGING  ct_range = gs_ranges-intfid ).
     ENDIF.
 
-    SELECT * INTO TABLE et_list
-      FROM zintfmonitor010
-      WHERE intfid IN ms_ranges-intfid.
-
-    INSERT LINES OF et_list INTO TABLE mt_buffer.
-    SORT mt_buffer.
-    DELETE ADJACENT DUPLICATES FROM mt_buffer.
+    LOOP AT gt_buffer INTO DATA(ls_buffer) WHERE intfid IN gs_ranges-intfid.
+      INSERT INITIAL LINE INTO TABLE et_list ASSIGNING FIELD-SYMBOL(<ls_list>).
+      MOVE-CORRESPONDING ls_buffer TO <ls_list>.
+    ENDLOOP.
 
     IF et_list IS INITIAL.
       RAISE EXCEPTION TYPE zcx_intfmonitor.
@@ -108,7 +110,8 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
 
 
   METHOD init_buffer.
-    CLEAR mt_buffer[].
+    CLEAR gt_buffer[].
+    do_select( ).
   ENDMETHOD.
 
 
@@ -118,15 +121,20 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
 
         MOVE-CORRESPONDING ls_detail TO rs_detail_x.
 
-        SELECT SINGLE descript  INTO rs_detail_x-xclsname FROM seoclasstx WHERE clsname = rs_detail_x-clsname AND langu = id_langu.
+        SELECT SINGLE descript
+          INTO rs_detail_x-xclsname
+          FROM seoclasstx
+          WHERE clsname = rs_detail_x-clsname
+            AND langu   = id_langu.
         IF sy-subrc IS NOT INITIAL.
           rs_detail_x-xclsname = |< { rs_detail_x-xclsname } >|.
         ENDIF.
 
-        rs_detail_x-xinbout = zcl_intfmonitor_util=>get_domain_text( id_domname = 'ZZDINTFINOUT' id_value = rs_detail_x-inbout ).
+        rs_detail_x-xinbout = zcl_intfmonitor_util=>get_domain_text( id_domname = 'ZZDINTFINOUT'
+                                                                     id_value   = rs_detail_x-inbout ).
 
         TRY.
-            data(ls_intfmonitor011) = zcl_zintfmonitor011_read=>get_details( id_intfid = rs_detail_x-intfid ).
+            DATA(ls_intfmonitor011) = zcl_zintfmonitor011_read=>get_details( id_intfid = rs_detail_x-intfid ).
             rs_detail_x-xintfid = ls_intfmonitor011-xintfid.
           CATCH zcx_intfmonitor.
             rs_detail_x-xintfid = |< { rs_detail_x-intfid } >|.
@@ -136,6 +144,17 @@ CLASS zcl_zintfmonitor010_read IMPLEMENTATION.
         RAISE EXCEPTION lo_exception.
     ENDTRY.
 
+  ENDMETHOD.
+
+
+  METHOD do_select.
+
+    SELECT * INTO TABLE gt_buffer FROM zintfmonitor010 ORDER BY PRIMARY KEY.
+
+  ENDMETHOD.
+
+  METHOD class_constructor.
+    init_buffer( ).
   ENDMETHOD.
 
 ENDCLASS.

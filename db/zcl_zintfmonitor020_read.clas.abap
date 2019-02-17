@@ -1,7 +1,7 @@
 "! <p class="shorttext synchronized" lang="en">Interface executions</p>
 CLASS zcl_zintfmonitor020_read DEFINITION
   PUBLIC
-  CREATE PRIVATE INHERITING FROM zcl_zintfmonitor_base_read..
+  CREATE PRIVATE INHERITING FROM zcl_zintfmonitor_base_read.
 
   PUBLIC SECTION.
 
@@ -85,9 +85,9 @@ CLASS zcl_zintfmonitor020_read DEFINITION
       END   OF mtyp_ranges .
 
     "! <p class="shorttext synchronized" lang="en">Selection Ranges</p>
-    CLASS-DATA ms_ranges TYPE mtyp_ranges .
+    CLASS-DATA gs_ranges TYPE mtyp_ranges .
     "! <p class="shorttext synchronized" lang="en">Data Buffer</p>
-    CLASS-DATA mt_buffer TYPE ztt_zintfmonitor020 .
+    CLASS-DATA gt_buffer TYPE ztt_zintfmonitor020 .
 
 ENDCLASS.
 
@@ -101,7 +101,7 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
     DATA ls_list      LIKE LINE OF lt_list.
     DATA lo_exception TYPE REF TO  zcx_intfmonitor.
 
-    CHECK is_details IS NOT INITIAL.
+    ASSERT is_details IS NOT INITIAL.
     TRY .
         MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
@@ -114,7 +114,7 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
 
   METHOD delete_list.
 
-    CHECK it_list[] IS NOT INITIAL.
+    ASSERT it_list[] IS NOT INITIAL.
     DELETE zintfmonitor020  FROM TABLE it_list.
 
     IF NOT sy-subrc IS INITIAL.
@@ -129,7 +129,7 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
     DATA ls_list      LIKE LINE OF lt_list.
     DATA lo_exception TYPE REF TO zcx_intfmonitor.
 
-    READ TABLE mt_buffer INTO rs_result
+    READ TABLE gt_buffer INTO rs_result
       WITH KEY guid = id_guid.
 
     IF NOT sy-subrc IS INITIAL.
@@ -151,20 +151,20 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
 
   METHOD get_list.
 
-    CLEAR ms_ranges.
+    CLEAR gs_ranges.
 
     IF id_guid IS SUPPLIED.
       _add_range( EXPORTING id_low   = id_guid
-                  CHANGING  ct_range = ms_ranges-guid ).
+                  CHANGING  ct_range = gs_ranges-guid ).
     ENDIF.
 
     SELECT * INTO TABLE et_list
       FROM zintfmonitor020
-      WHERE guid IN ms_ranges-guid.
+      WHERE guid IN gs_ranges-guid.
 
-    INSERT LINES OF et_list INTO TABLE mt_buffer.
-    SORT mt_buffer.
-    DELETE ADJACENT DUPLICATES FROM mt_buffer.
+    INSERT LINES OF et_list INTO TABLE gt_buffer.
+    SORT gt_buffer.
+    DELETE ADJACENT DUPLICATES FROM gt_buffer.
 
     IF et_list IS INITIAL.
       RAISE EXCEPTION TYPE zcx_intfmonitor.
@@ -173,7 +173,7 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
 
 
   METHOD init_buffer.
-    CLEAR mt_buffer[].
+    CLEAR gt_buffer[].
   ENDMETHOD.
 
 
@@ -181,12 +181,12 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
     DATA lt_list TYPE ztt_zintfmonitor020 .
     DATA ls_list LIKE LINE OF lt_list.
 
-    CHECK is_details IS NOT INITIAL.
+    ASSERT is_details IS NOT INITIAL.
     TRY .
         MOVE-CORRESPONDING is_details TO ls_list.
         INSERT ls_list INTO TABLE lt_list[].
         save_list( lt_list[] ).
-      CATCH zcx_intfmonitor INTO data(lo_exception).
+      CATCH zcx_intfmonitor INTO DATA(lo_exception).
         RAISE EXCEPTION lo_exception.
     ENDTRY.
   ENDMETHOD.
@@ -194,7 +194,7 @@ CLASS zcl_zintfmonitor020_read IMPLEMENTATION.
 
   METHOD save_list.
 
-    CHECK it_list[] IS NOT INITIAL.
+    ASSERT it_list[] IS NOT INITIAL.
     MODIFY zintfmonitor020  FROM TABLE it_list.
 
     IF NOT sy-subrc IS INITIAL.

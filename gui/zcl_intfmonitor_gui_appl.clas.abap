@@ -224,7 +224,7 @@ CLASS zcl_intfmonitor_gui_appl IMPLEMENTATION.
     do_search( EXPORTING is_filter_by = ls_filter_by
                IMPORTING et_list      = lt_list ).
 
-    initialize( EXPORTING it_list     = lt_list ).
+    initialize( lt_list ).
 
   ENDMETHOD.
 ENDCLASS.

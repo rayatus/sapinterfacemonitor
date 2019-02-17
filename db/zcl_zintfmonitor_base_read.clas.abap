@@ -26,13 +26,13 @@ CLASS zcl_zintfmonitor_base_read IMPLEMENTATION.
 
     INSERT INITIAL LINE INTO TABLE ct_range ASSIGNING <ls_row>.
 
-    ASSIGN COMPONENT 'LOW' OF STRUCTURE <ls_row> TO <ld_low>.
+    ASSIGN COMPONENT 'LOW' OF STRUCTURE <ls_row> TO <ld_low>. "#EC NOTEXT
     <ld_low> = id_low.
 
-    ASSIGN COMPONENT 'SIGN' OF STRUCTURE <ls_row> TO <ld_sign>.
+    ASSIGN COMPONENT 'SIGN' OF STRUCTURE <ls_row> TO <ld_sign>. "#EC NOTEXT
     <ld_sign> = 'I'.
 
-    ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>.
+    ASSIGN COMPONENT 'OPTION' OF STRUCTURE <ls_row> TO <ld_option>. "#EC NOTEXT
     <ld_option> = 'EQ'.
   ENDMETHOD.
 ENDCLASS.

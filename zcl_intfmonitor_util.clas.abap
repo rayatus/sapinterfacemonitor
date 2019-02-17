@@ -9,7 +9,7 @@ CLASS zcl_intfmonitor_util DEFINITION
     TYPES:
       BEGIN OF mtyp_s_intf_param,
         datatype  TYPE zzeintfdatatype,
-        param	    TYPE zzeintfdatapar,
+        param     TYPE zzeintfdatapar,
         xparam    TYPE zzexintfdatapar,
         xdatatype TYPE ddtext,
         paramtype TYPE zzeintfdatapartype,
@@ -20,7 +20,8 @@ CLASS zcl_intfmonitor_util DEFINITION
     "! <p class="shorttext synchronized" lang="en">Gets Domain Value text</p>
     "!
     "! @parameter id_domname | <p class="shorttext synchronized" lang="en">Domain name</p>
-    "! @parameter id_value   | <p class="shorttext synchronized" lang="en">Values for Domains: Single Value / Upper Limit</p>
+    "! @parameter id_value   | <p class="shorttext synchronized" lang="en">Values for Domains:
+    "! Single Value / Upper Limit</p>
     "! @parameter rd_text    | <p class="shorttext synchronized" lang="en">Short Text for Fixed Values</p>
     CLASS-METHODS get_domain_text
       IMPORTING id_domname     TYPE dd07v-domname
@@ -85,7 +86,8 @@ CLASS zcl_intfmonitor_util IMPLEMENTATION.
       <ls_definition>-param     = <ls_list>-param.
       <ls_definition>-datatype  = <ls_list>-datatype.
       <ls_definition>-paramtype = <ls_list>-paramtype.
-      <ls_definition>-xdatatype = get_domain_text( id_domname = 'ZZDINTFDATATYPE'  id_value   = <ls_definition>-datatype ). "#EC NOTEXT
+      <ls_definition>-xdatatype = get_domain_text( id_domname = 'ZZDINTFDATATYPE'
+                                                   id_value   = <ls_definition>-datatype ). "#EC NOTEXT
 
       TRY.
           ls_details = zcl_zintfmonitor013_read=>get_details( id_intfid = io_interface->ms_detail-intfid
