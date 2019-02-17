@@ -2,7 +2,7 @@
 CLASS zcl_intfmonitor_gui_appl_comp DEFINITION
   PUBLIC
   ABSTRACT
-  CREATE PUBLIC .
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
     "! <p class="shorttext synchronized" lang="en">List of interface executions</p>
@@ -39,7 +39,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_intfmonitor_gui_appl_comp IMPLEMENTATION.
+CLASS ZCL_INTFMONITOR_GUI_APPL_COMP IMPLEMENTATION.
 
 
   METHOD display.

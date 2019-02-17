@@ -3,7 +3,7 @@ CLASS zcl_intfmonitor_gui_list DEFINITION
   PUBLIC
   INHERITING FROM zcl_intfmonitor_gui_appl_comp
   FINAL
-  CREATE PUBLIC .
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
 

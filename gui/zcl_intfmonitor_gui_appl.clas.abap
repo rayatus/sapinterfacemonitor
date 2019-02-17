@@ -2,7 +2,7 @@
 CLASS zcl_intfmonitor_gui_appl DEFINITION
   PUBLIC
   FINAL
-  CREATE PUBLIC .
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
 

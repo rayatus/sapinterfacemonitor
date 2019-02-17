@@ -1,5 +1,5 @@
 INTERFACE zif_intfmonitor
-  PUBLIC .
+  PUBLIC.
 
   DATA:
     md_guid     TYPE zzeintfprocguid READ-ONLY,

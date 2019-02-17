@@ -3,7 +3,7 @@ CLASS zcl_intfmonitor_gui_detail DEFINITION
   PUBLIC
   INHERITING FROM zcl_intfmonitor_gui_appl_comp
   FINAL
-  CREATE PUBLIC .
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
 
@@ -251,7 +251,7 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
       lf_first_time = abap_false.
     ENDIF.
 
-    mo_dd_document->initialize_document( EXPORTING first_time = lf_first_time ).
+    mo_dd_document->initialize_document( first_time = lf_first_time ).
 
     " Prepare text to be displayed
     READ TABLE mt_list INDEX 1 INTO lo_intfmonitor.
@@ -544,7 +544,7 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
   METHOD on_parameter_selected.
 
     TRY.
-        display_param_data( id_param = id_param   ).
+        display_param_data( id_param = id_param ).
       CATCH zcx_intfmonitor.
         "Do nothing
     ENDTRY.
