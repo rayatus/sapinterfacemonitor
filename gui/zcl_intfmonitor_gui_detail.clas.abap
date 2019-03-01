@@ -284,8 +284,8 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
           lf_new      TYPE         xfeld.
 
     IF mo_tree IS BOUND.
-     " It's not necessary to build once again Tree, just delete its content
-     " and insert new data
+      " It's not necessary to build once again Tree, just delete its content
+      " and insert new data
       lo_nodes = mo_tree->get_nodes( ).
       TRY.
           lo_nodes->delete_all( ).
@@ -455,6 +455,9 @@ CLASS zcl_intfmonitor_gui_detail IMPLEMENTATION.
     "Retrieve parameter data from interface execution
     ls_list->get_parameter( EXPORTING id_param = id_param
                             IMPORTING er_data  = lr_data ).
+    IF lr_data IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_intfmonitor.
+    ENDIF.
 
     "Determine stored type and create internal table
     lo_type_descr =  cl_abap_typedescr=>describe_by_data_ref( lr_data ).

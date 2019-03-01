@@ -69,7 +69,7 @@ FORM prepare_custo.
   ls_zintfmonitor012-datatype   = 'R'.
   INSERT ls_zintfmonitor012 INTO TABLE lt_zintfmonitor012.
 
-*  MODIFY zintfmonitor012 FROM TABLE lt_zintfmonitor012.
+*  MODIFY zintfmonitor012 FROM TABLE lt_zintfmonitor012. Not longer needed because it's automatically filled by API
 
 ENDFORM.
 
