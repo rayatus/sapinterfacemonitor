@@ -11,9 +11,9 @@ You will find report **ZINTFMONITOR_DUMMY_DATAGEN** that prepares custo for 2 di
 # How to use it
 The main idea is to create an instance via **ZCF_INFTMONITOR=>NEW( )**, add input/output parameters via **LO_INSTANCE->ADD_PARAMETER( )** and before ending save in with **LO_INSTANCE->STORE( )**.
 
-For each interface some customizing has to be done:
-- Ensure that in SM30 **ZVINTFMONITOR** the interface ID exists
-- Ensure that also input/output parameters exists in SM30 **ZVINTFMONITORPAR** so that the framework knows how to display them in the monitor application.
+For each interface some customizing has to be done (transaction **ZINTFMONITORC**):
+- Ensure that every interface has it's entry in custo.
+- Per every interface parameterso that the framework knows how to display them in the monitor application.
 
 In order to display traced executions just execute transaction **ZINTFMONITOR**.
 
