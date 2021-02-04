@@ -4,8 +4,6 @@
   <asx:values>
    <PROGDIR>
     <NAME>SAPLZINTFMONITORSM30</NAME>
-    <STATE>A</STATE>
-    <SQLX>X</SQLX>
     <DBAPL>S</DBAPL>
     <DBNA>D$</DBNA>
     <SUBC>F</SUBC>

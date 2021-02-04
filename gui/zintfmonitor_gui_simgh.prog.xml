@@ -3,16 +3,18 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZINFMONITOR_GUI_APPL_PAI</NAME>
-    <SUBC>I</SUBC>
-    <RLOAD>E</RLOAD>
+    <NAME>ZINTFMONITOR_GUI_SIMGH</NAME>
+    <DBAPL>S</DBAPL>
+    <SUBC>1</SUBC>
+    <FIXPT>X</FIXPT>
+    <LDBNAME>D$S</LDBNAME>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
    <TPOOL>
     <item>
      <ID>R</ID>
-     <ENTRY>Include ZINFMONITOR_GUI_APPL_PAI</ENTRY>
-     <LENGTH>32</LENGTH>
+     <ENTRY>SAP Interface Monitor : IMG structure launcher</ENTRY>
+     <LENGTH>46</LENGTH>
     </item>
    </TPOOL>
   </asx:values>
