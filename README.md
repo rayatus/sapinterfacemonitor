@@ -1,4 +1,6 @@
-[![abaplint](https://app.abaplint.org/badges/rayatus/sapinterfacemonitor)](https://app.abaplint.org/project/rayatus/sapinterfacemonitor)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/rayatus/sapinterfacemonitor/blob/master/LICENSE)
+![ABAP 7.40sp08+](https://img.shields.io/badge/ABAP-7.40sp08+-brightgreen)
+[![Code Statistics](https://img.shields.io/badge/CodeStatistics-abaplint-blue)](https://abaplint.app/stats/rayatus/sapinterfacemonitor)
 
 # SAPInterfaceMonitor
 SAP interface monitor is a custom framework and application for login communications, rigth now only RFCs (functions) are supported.
